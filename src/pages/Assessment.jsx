@@ -13,7 +13,6 @@ export default function Assessment() {
   const [counterparties, setCounterparties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [preselectedId, setPreselectedId] = useState(null);
-  const [assessmentComplete, setAssessmentComplete] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -50,7 +49,7 @@ export default function Assessment() {
   };
 
   const handleComplete = (assessment) => {
-    setAssessmentComplete(true);
+    window.location.href = createPageUrl('Dashboard');
   };
 
   if (authLoading || loading) {
@@ -72,42 +71,6 @@ export default function Assessment() {
               <p className="text-slate-500">
                 You don't have permission to run assessments. Contact your admin for access.
               </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
-  if (assessmentComplete) {
-    return (
-      <div className="min-h-screen bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <Card>
-            <CardContent className="py-16 text-center">
-              <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileCheck className="w-8 h-8 text-emerald-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">Assessment Saved</h3>
-              <p className="text-slate-500 mb-6">
-                Your assessment has been saved successfully.
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    setAssessmentComplete(false);
-                    setPreselectedId(null);
-                  }}
-                >
-                  New Assessment
-                </Button>
-                <Link to={createPageUrl('Reports')}>
-                  <Button className="bg-emerald-600 hover:bg-emerald-700">
-                    View Reports
-                  </Button>
-                </Link>
-              </div>
             </CardContent>
           </Card>
         </div>

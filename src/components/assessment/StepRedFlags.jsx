@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { performNegativePressSearch } from '@/components/adverseMedia/adverseMediaService';
+import { performSanctionsCheck } from '@/components/sanctions/sanctionsService';
 import { format } from 'date-fns';
 import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
@@ -42,6 +43,15 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
     time_window: 'last_12_months',
     custom_terms: ''
   });
+  
+  const [showSanctionsSearch, setShowSanctionsSearch] = useState(false);
+  const [sanctionsSearching, setSanctionsSearching] = useState(false);
+  const [sanctionsResults, setSanctionsResults] = useState(null);
+  const [sanctionsInputs, setSanctionsInputs] = useState({
+    company_name: counterparty?.name || '',
+    uen: counterparty?.uen || '',
+    director_names: ''
+  });
 
   const handleRunCheck = async () => {
     setSearching(true);
@@ -65,6 +75,30 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
     }
   };
 
+  const handleSanctionsCheck = async () => {
+    setSanctionsSearching(true);
+    try {
+      const results = await performSanctionsCheck(sanctionsInputs);
+      setSanctionsResults(results);
+      
+      // Auto-update sanctions field based on results
+      if (results.overall_assessment === 'Clear') {
+        onChange({ sanctions_concern: 'no' });
+      } else if (results.overall_assessment === 'Confirmed Match') {
+        onChange({ sanctions_concern: 'yes' });
+      } else {
+        onChange({ sanctions_concern: 'unknown' });
+      }
+      
+      toast.success('Sanctions check completed');
+    } catch (error) {
+      console.error('Sanctions check error:', error);
+      toast.error('Sanctions check failed. Please try again.');
+    } finally {
+      setSanctionsSearching(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Alert className="bg-amber-50 border-amber-200">
@@ -78,15 +112,160 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
       {/* Sanctions */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Shield className="w-4 h-4 text-red-600" />
-            Sanctions & Watchlists
-          </CardTitle>
-          <CardDescription>Critical compliance check</CardDescription>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Shield className="w-4 h-4 text-red-600" />
+                Sanctions & Watchlists
+              </CardTitle>
+              <CardDescription>Critical compliance check</CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSanctionsSearch(!showSanctionsSearch)}
+            >
+              <Search className="w-4 h-4 mr-2" />
+              {showSanctionsSearch ? 'Hide' : 'Run'} Check
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Inline Search Form */}
+          {showSanctionsSearch && (
+            <div className="space-y-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border">
+              <Alert className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+                <Shield className="h-4 w-4 text-red-600 dark:text-red-400" />
+                <AlertDescription className="text-xs text-red-800 dark:text-red-200">
+                  <strong>Automated screening:</strong> This searches public sanctions databases. Results should be verified against official sources before making final decisions.
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <Label className="text-xs">Company Name</Label>
+                  <Input
+                    value={sanctionsInputs.company_name}
+                    onChange={(e) => setSanctionsInputs({ ...sanctionsInputs, company_name: e.target.value })}
+                    placeholder="Company name"
+                    className="h-9"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs">Directors/Key Persons (Optional)</Label>
+                  <Input
+                    value={sanctionsInputs.director_names}
+                    onChange={(e) => setSanctionsInputs({ ...sanctionsInputs, director_names: e.target.value })}
+                    placeholder="Comma-separated names"
+                    className="h-9"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleSanctionsCheck}
+                  disabled={sanctionsSearching || !sanctionsInputs.company_name}
+                  className="w-full h-9 bg-red-600 hover:bg-red-700"
+                  size="sm"
+                >
+                  {sanctionsSearching ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Checking...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="w-4 h-4 mr-2" />
+                      Check Sanctions Lists
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Sanctions Results */}
+          {sanctionsResults && (
+            <div className={cn("space-y-3 p-4 rounded-lg border", 
+              sanctionsResults.overall_assessment === 'Clear' 
+                ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+            )}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1">
+                  <p className={cn("text-sm font-medium", 
+                    sanctionsResults.overall_assessment === 'Clear' 
+                      ? "text-green-900 dark:text-green-100"
+                      : "text-red-900 dark:text-red-100"
+                  )}>
+                    {sanctionsResults.summary}
+                  </p>
+                </div>
+                <Badge className={cn("text-xs", 
+                  sanctionsResults.overall_assessment === 'Clear' 
+                    ? "bg-green-600 text-white" 
+                    : sanctionsResults.overall_assessment === 'Confirmed Match'
+                    ? "bg-red-600 text-white"
+                    : "bg-amber-600 text-white"
+                )}>
+                  {sanctionsResults.overall_assessment}
+                </Badge>
+              </div>
+
+              {sanctionsResults.findings && sanctionsResults.findings.length > 0 && (
+                <div className="space-y-2 mt-3">
+                  {sanctionsResults.findings.map((finding, idx) => (
+                    <div key={idx} className="p-3 bg-white dark:bg-slate-800 rounded border text-xs space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-medium text-slate-900 dark:text-slate-100">
+                          {finding.name}
+                        </p>
+                        <Badge variant="outline" className="text-xs">
+                          {finding.match_type}
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-slate-600 dark:text-slate-400">
+                          <strong>Source:</strong> {finding.source}
+                        </p>
+                        <p className="text-slate-600 dark:text-slate-400">
+                          <strong>Status:</strong> {finding.status}
+                        </p>
+                        <p className="text-slate-600 dark:text-slate-400">
+                          {finding.details}
+                        </p>
+                        {finding.url && (
+                          <a
+                            href={finding.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-red-600 hover:text-red-700 flex items-center gap-1 mt-1"
+                          >
+                            View Source <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Alert className={cn(
+                sanctionsResults.recommendation === 'Do Not Proceed' 
+                  ? "bg-red-100 dark:bg-red-900/40 border-red-300" 
+                  : "bg-amber-100 dark:bg-amber-900/40 border-amber-300"
+              )}>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription className="text-xs">
+                  <strong>Recommendation:</strong> {sanctionsResults.recommendation}
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
+
+          {/* Manual Selection */}
           <div className="space-y-2">
-            <Label>Any sanctions or watchlist concerns?</Label>
+            <Label>Assessment Result</Label>
             <Select
               value={data.sanctions_concern}
               onValueChange={(value) => onChange({ sanctions_concern: value })}
@@ -101,7 +280,7 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
               </SelectContent>
             </Select>
             <p className="text-xs text-slate-500">
-              Check against MAS, UN, OFAC, and relevant sanctions lists
+              Auto-updated based on search results, or select manually
             </p>
           </div>
 

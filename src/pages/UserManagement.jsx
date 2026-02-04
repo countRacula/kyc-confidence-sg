@@ -22,6 +22,7 @@ import { PullToRefresh } from '@/components/ui/PullToRefresh';
 export default function UserManagement() {
   const { user, organisation, loading: authLoading, isAdmin } = useAuth();
   const [users, setUsers] = useState([]);
+  const [pendingInvites, setPendingInvites] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -39,11 +40,13 @@ export default function UserManagement() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [usersData, logsData] = await Promise.all([
+      const [usersData, invitesData, logsData] = await Promise.all([
         base44.entities.User.list(),
+        base44.users.listPendingInvites(),
         base44.entities.AuditLog.filter({ org_id: organisation.id }, '-created_date', 50)
       ]);
       setUsers(usersData.filter(u => u.org_id === organisation.id));
+      setPendingInvites(invitesData || []);
       setAuditLogs(logsData);
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -211,7 +214,7 @@ export default function UserManagement() {
                     <div>
                       <CardTitle>Team Members</CardTitle>
                       <CardDescription>
-                        {users.length} user{users.length !== 1 ? 's' : ''} in your organisation
+                        {users.length} active user{users.length !== 1 ? 's' : ''} • {pendingInvites.length} pending
                       </CardDescription>
                     </div>
                     <div className="w-full max-w-xs">
@@ -238,6 +241,40 @@ export default function UserManagement() {
                     </div>
                   ) : (
                     <div className="space-y-3">
+                      {pendingInvites.length > 0 && (
+                        <div className="pb-3 border-b">
+                          <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Pending Invitations</h3>
+                          {pendingInvites.map((invite) => (
+                            <div 
+                              key={invite.email}
+                              className="flex items-center justify-between p-4 border rounded-lg bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800 mb-2"
+                            >
+                              <div className="flex items-center gap-4 flex-1">
+                                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/50 rounded-full flex items-center justify-center">
+                                  <Mail className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-slate-900 dark:text-slate-100 truncate">
+                                    {invite.email}
+                                  </p>
+                                  <p className="text-sm text-amber-600 dark:text-amber-400">
+                                    Invitation pending
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                {getRoleBadge(invite.role)}
+                                {invite.invited_at && (
+                                  <div className="hidden sm:flex items-center gap-1 text-xs text-slate-500">
+                                    <Calendar className="w-3 h-3" />
+                                    {format(new Date(invite.invited_at), 'dd MMM yyyy')}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       {filteredUsers.map((u) => (
                         <div 
                           key={u.id}

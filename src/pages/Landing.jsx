@@ -127,26 +127,26 @@ export default function Landing() {
                 ))}
               </div>
             </div>
-            <Card className="p-8 bg-white">
+            <Card className="p-6 md:p-8 bg-white">
               <div className="text-center">
-                <div className="text-6xl font-bold text-emerald-600 mb-2">0-100</div>
-                <div className="text-slate-600 mb-6">Credit Confidence Score</div>
+                <div className="text-5xl md:text-6xl font-bold text-emerald-600 mb-2">0-100</div>
+                <div className="text-slate-600 mb-6 text-sm md:text-base">Credit Confidence Score</div>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-emerald-500" />
-                    <span className="text-sm">80-100: Green – Proceed</span>
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className="w-4 h-4 rounded-full bg-emerald-500 flex-shrink-0" />
+                    <span className="text-xs md:text-sm text-left">80-100: Green – Proceed</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-amber-500" />
-                    <span className="text-sm">60-79: Amber – With Limits</span>
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className="w-4 h-4 rounded-full bg-amber-500 flex-shrink-0" />
+                    <span className="text-xs md:text-sm text-left">60-79: Amber – With Limits</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-red-500" />
-                    <span className="text-sm">40-59: Red – Mitigations Required</span>
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className="w-4 h-4 rounded-full bg-red-500 flex-shrink-0" />
+                    <span className="text-xs md:text-sm text-left">40-59: Red – Mitigations Required</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full bg-red-800" />
-                    <span className="text-sm">&lt;40: High Risk – Manual Approval</span>
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className="w-4 h-4 rounded-full bg-red-800 flex-shrink-0" />
+                    <span className="text-xs md:text-sm text-left">&lt;40: High Risk – Manual Approval</span>
                   </div>
                 </div>
               </div>

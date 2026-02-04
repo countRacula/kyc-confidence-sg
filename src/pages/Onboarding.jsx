@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Building2, ArrowRight, Loader2 } from "lucide-react";
+import { Shield, Building2, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from '@/utils';
 
 export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [duplicateOrg, setDuplicateOrg] = useState(null);
   const [formData, setFormData] = useState({
     orgName: '',
     industry: '',
@@ -46,8 +47,37 @@ export default function Onboarding() {
     'Other'
   ];
 
+  const checkDuplicateOrg = async (orgName) => {
+    if (!orgName.trim()) {
+      setDuplicateOrg(null);
+      return;
+    }
+    
+    try {
+      const existingOrgs = await base44.entities.Organisation.filter({ 
+        name: orgName.trim() 
+      });
+      
+      if (existingOrgs.length > 0) {
+        const org = existingOrgs[0];
+        const adminUsers = await base44.entities.User.filter({ 
+          org_id: org.id,
+          org_role: 'admin'
+        });
+        setDuplicateOrg({ 
+          name: org.name, 
+          adminEmail: adminUsers[0]?.email 
+        });
+      } else {
+        setDuplicateOrg(null);
+      }
+    } catch (error) {
+      console.error('Failed to check duplicate:', error);
+    }
+  };
+
   const handleCreateOrganisation = async () => {
-    if (!formData.orgName.trim()) return;
+    if (!formData.orgName.trim() || duplicateOrg) return;
     
     setLoading(true);
     try {
@@ -104,8 +134,25 @@ export default function Onboarding() {
                 placeholder="e.g., ABC Trading Pte Ltd"
                 value={formData.orgName}
                 onChange={(e) => setFormData({ ...formData, orgName: e.target.value })}
+                onBlur={(e) => checkDuplicateOrg(e.target.value)}
               />
-              <p className="text-xs text-slate-500">Your company or business name</p>
+              {duplicateOrg ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-2">
+                  <div className="flex gap-2">
+                    <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-amber-900">
+                        Organisation "{duplicateOrg.name}" already exists
+                      </p>
+                      <p className="text-xs text-amber-700 mt-1">
+                        Please contact the admin ({duplicateOrg.adminEmail || 'admin'}) to request an invitation to join this organisation.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">Your company or business name</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -154,7 +201,7 @@ export default function Onboarding() {
             <Button 
               className="w-full bg-emerald-600 hover:bg-emerald-700"
               onClick={handleCreateOrganisation}
-              disabled={!formData.orgName.trim() || loading}
+              disabled={!formData.orgName.trim() || loading || duplicateOrg}
             >
               {loading ? (
                 <>

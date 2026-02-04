@@ -51,6 +51,9 @@ import Landing from './pages/Landing';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Records from './pages/Records';
+import Assessment from './pages/Assessment';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 
 export const PAGES = {
@@ -58,6 +61,9 @@ export const PAGES = {
     "Onboarding": Onboarding,
     "Dashboard": Dashboard,
     "Records": Records,
+    "Assessment": Assessment,
+    "Reports": Reports,
+    "Settings": Settings,
 }
 
 export const pagesConfig = {

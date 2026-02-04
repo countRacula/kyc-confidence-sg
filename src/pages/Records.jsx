@@ -32,6 +32,8 @@ import { useAuth } from '@/components/auth/useAuth';
 import CounterpartyForm from '@/components/records/CounterpartyForm';
 import DocumentUploader from '@/components/records/DocumentUploader';
 import { format } from 'date-fns';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { PageTransition } from '@/components/ui/PageTransition';
 
 export default function Records() {
   const { user, organisation, loading: authLoading, isAuthenticated, canEdit } = useAuth();

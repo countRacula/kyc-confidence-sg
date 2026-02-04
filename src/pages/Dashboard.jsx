@@ -22,6 +22,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    
     if (!authLoading && !isAuthenticated) {
       base44.auth.redirectToLogin();
       return;

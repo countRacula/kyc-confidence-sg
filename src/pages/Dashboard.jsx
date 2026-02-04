@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Building2, FileCheck, BarChart3, Plus, ArrowRight, 
   TrendingUp, Clock, AlertCircle, Info, Loader2
@@ -69,8 +70,13 @@ export default function Dashboard() {
         high_risk: assessments.filter(a => a.risk_band === 'high_risk' || a.risk_band === 'fail').length
       };
 
+      const clients = counterparties.filter(c => c.types?.includes('client'));
+      const suppliers = counterparties.filter(c => c.types?.includes('supplier'));
+
       setStats({
         totalRecords: counterparties.length,
+        clientsCount: clients.length,
+        suppliersCount: suppliers.length,
         assessments30: assessments30.length,
         assessments90: assessments90.length,
         riskDistribution
@@ -119,14 +125,29 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Record Type Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList className="grid w-full grid-cols-3 max-w-md">
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="clients">Clients</TabsTrigger>
+            <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-500">Total Records</p>
-                  <p className="text-3xl font-bold text-slate-900">{stats?.totalRecords || 0}</p>
+                  <p className="text-sm text-slate-500">
+                    {activeTab === 'all' ? 'Total Records' : activeTab === 'clients' ? 'Clients' : 'Suppliers'}
+                  </p>
+                  <p className="text-3xl font-bold text-slate-900">
+                    {activeTab === 'all' ? (stats?.totalRecords || 0) : 
+                     activeTab === 'clients' ? (stats?.clientsCount || 0) : 
+                     (stats?.suppliersCount || 0)}
+                  </p>
                 </div>
                 <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
                   <Building2 className="w-6 h-6 text-slate-600" />

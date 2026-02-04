@@ -54,6 +54,8 @@ import Records from './pages/Records';
 import Assessment from './pages/Assessment';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import FreeAssessment from './pages/FreeAssessment';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -64,9 +66,11 @@ export const PAGES = {
     "Assessment": Assessment,
     "Reports": Reports,
     "Settings": Settings,
+    "FreeAssessment": FreeAssessment,
 }
 
 export const pagesConfig = {
     mainPage: "Landing",
     Pages: PAGES,
+    Layout: __Layout,
 };

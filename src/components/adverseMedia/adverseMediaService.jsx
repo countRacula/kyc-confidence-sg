@@ -271,58 +271,116 @@ Respond in JSON:
   }
 }
 
-// Main search orchestration
+// Main search orchestration using AI-powered web search
 export async function performNegativePressSearch(inputs, onProgress) {
   try {
-    onProgress?.('Generating search queries...');
-    const queries = generateSearchQueries(inputs);
-    const dateRange = getDateRange(inputs.time_window);
+    onProgress?.('Searching Google and news sources...');
+    
+    const { company_name, uen, director_names, locale } = inputs;
+    
+    const localeContext = locale === 'Singapore' ? 'Focus on Singapore sources and Singapore-related news.' : '';
+    
+    const prompt = `Search Google, Google News, and other public sources for negative press or adverse media about this company:
 
-    onProgress?.('Searching public sources...');
-    let allResults = [];
+Company Name: ${company_name}
+${uen ? `UEN: ${uen}` : ''}
+${director_names ? `Directors: ${director_names}` : ''}
+${localeContext}
 
-    // Fetch from both sources for each query
-    for (const queryObj of queries) {
-      const [gdeltResults, newsResults] = await Promise.allSettled([
-        fetchGDELT(queryObj.query, dateRange),
-        fetchGoogleNews(queryObj.query)
-      ]);
+Search for news articles about:
+- Fraud, scams, or financial misconduct
+- Lawsuits, legal disputes, or investigations
+- Insolvency, liquidation, or business failure
+- Regulatory enforcement actions
+- Criminal charges or convictions
+- Customer complaints or scandals
+- Any other negative reputation issues
 
-      if (gdeltResults.status === 'fulfilled') {
-        allResults.push(...gdeltResults.value);
-      }
-      if (newsResults.status === 'fulfilled') {
-        allResults.push(...newsResults.value);
-      }
+For EACH article found, provide:
+{
+  "articles": [
+    {
+      "title": "Article headline",
+      "publisher": "News source name",
+      "url": "Direct link to article",
+      "published_date": "YYYY-MM-DD format",
+      "snippet": "Brief excerpt from the article",
+      "summary": "1-2 sentence summary of what happened",
+      "tag": "Allegation|Investigation|Civil dispute|Enforcement|Conviction|Insolvency|Other",
+      "severity": "Low|Medium|High"
     }
+  ],
+  "overall_summary": "2-4 sentence assessment of all findings",
+  "overall_signal": "None|Informational|Potential Risk|High Risk"
+}
+
+If no adverse media found, return empty articles array with overall_signal: "None"`;
+
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt,
+      add_context_from_internet: true,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          articles: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                title: { type: "string" },
+                publisher: { type: "string" },
+                url: { type: "string" },
+                published_date: { type: "string" },
+                snippet: { type: "string" },
+                summary: { type: "string" },
+                tag: { type: "string" },
+                severity: { type: "string" }
+              }
+            }
+          },
+          overall_summary: { type: "string" },
+          overall_signal: { type: "string" }
+        }
+      }
+    });
 
     onProgress?.('Processing results...');
-    const deduped = deduplicateResults(allResults);
-    const ranked = rankResults(deduped, inputs.locale);
 
-    if (ranked.length === 0) {
-      return {
-        results: [],
-        rollup_summary: {
-          summary_text: 'No adverse media coverage found in public sources for the specified search criteria.',
-          overall_signal: 'None',
-          most_recent_date: null,
-          counts_by_severity: { low: 0, medium: 0, high: 0 }
-        }
-      };
-    }
+    // Transform to match expected format
+    const results = result.articles.map(article => ({
+      source: 'Web Search',
+      title: article.title || 'Untitled',
+      publisher: article.publisher || 'Unknown',
+      url: article.url || '',
+      published_date: article.published_date || new Date().toISOString(),
+      snippet: article.snippet || '',
+      per_article_summary: article.summary || article.snippet,
+      tag: article.tag || 'Other',
+      severity: article.severity || 'Low'
+    }));
 
-    onProgress?.('Analyzing articles with AI...');
-    const summarized = await Promise.all(
-      ranked.map(article => summarizeArticle(article))
-    );
+    // Calculate counts
+    const counts = {
+      low: results.filter(r => r.severity === 'Low').length,
+      medium: results.filter(r => r.severity === 'Medium').length,
+      high: results.filter(r => r.severity === 'High').length
+    };
 
-    onProgress?.('Generating overall summary...');
-    const rollup = await generateRollupSummary(summarized);
+    const validDates = results
+      .map(r => new Date(r.published_date))
+      .filter(d => !isNaN(d.getTime()));
+    const mostRecentDate = validDates.length > 0 
+      ? new Date(Math.max(...validDates))
+      : null;
 
     return {
-      results: summarized,
-      rollup_summary: rollup
+      results,
+      rollup_summary: {
+        summary_text: result.overall_summary || 'No adverse media coverage found.',
+        overall_signal: result.overall_signal || 'None',
+        most_recent_date: mostRecentDate?.toISOString(),
+        counts_by_severity: counts
+      }
     };
   } catch (error) {
     console.error('Negative press search error:', error);

@@ -146,6 +146,8 @@ export default function AssessmentWizard({
           <StepRedFlags
             data={assessmentData}
             onChange={handleDataChange}
+            counterpartyId={selectedCounterparty?.id}
+            assessmentId={null}
           />
         );
       case 4:

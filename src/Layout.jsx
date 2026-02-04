@@ -82,7 +82,7 @@ export default function Layout({ children, currentPageName }) {
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -90,8 +90,8 @@ export default function Layout({ children, currentPageName }) {
       {/* Sidebar - always visible on desktop, toggleable on mobile */}
       <aside className={cn(
         "fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-50 transform transition-transform",
-        "lg:translate-x-0 lg:block",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        "md:translate-x-0 md:block",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -182,9 +182,9 @@ export default function Layout({ children, currentPageName }) {
       </aside>
 
       {/* Main content */}
-      <div className={cn("lg:ml-64", showBottomNav && "pb-20 lg:pb-0")}>
+      <div className={cn("md:ml-64", showBottomNav && "pb-20 md:pb-0")}>
         {/* Mobile-only header */}
-        <header className="lg:hidden sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-30 pt-[env(safe-area-inset-top)]">
+        <header className="md:hidden sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-30 pt-[env(safe-area-inset-top)]">
           <div className="flex items-center gap-3 px-4 py-3">
             {showBottomNav ? (
               <button
@@ -220,7 +220,7 @@ export default function Layout({ children, currentPageName }) {
 
         {/* Bottom Tab Bar - Mobile Only */}
         {showBottomNav && (
-          <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 pb-[env(safe-area-inset-bottom)] z-40">
+          <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 pb-[env(safe-area-inset-bottom)] z-40">
             <div className="grid grid-cols-4 h-16">
               {navigation.map((item) => {
                 const isActive = currentPageName === item.page;

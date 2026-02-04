@@ -13,15 +13,20 @@ import { format } from 'date-fns';
 import { cn } from "@/lib/utils";
 import { toast } from 'sonner';
 
-const KEYWORD_OPTIONS = [
-  'fraud', 'scam', 'lawsuit', 'investigation', 'bribery', 
-  'tax', 'insolvency', 'winding up', 'liquidation', 'conviction'
-];
-
 const SEVERITY_COLORS = {
   'Low': 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   'Medium': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   'High': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+};
+
+const TAG_COLORS = {
+  'Allegation': 'bg-amber-100 text-amber-700',
+  'Investigation': 'bg-orange-100 text-orange-700',
+  'Civil dispute': 'bg-blue-100 text-blue-700',
+  'Enforcement': 'bg-red-100 text-red-700',
+  'Conviction': 'bg-red-200 text-red-800',
+  'Insolvency': 'bg-purple-100 text-purple-700',
+  'Other': 'bg-slate-100 text-slate-700'
 };
 
 export default function StepRedFlags({ data, onChange, counterparty }) {
@@ -58,15 +63,6 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
     } finally {
       setSearching(false);
     }
-  };
-
-  const handleKeywordToggle = (keyword) => {
-    setSearchInputs(prev => ({
-      ...prev,
-      keywords: prev.keywords.includes(keyword)
-        ? prev.keywords.filter(k => k !== keyword)
-        : [...prev.keywords, keyword]
-    }));
   };
 
   return (
@@ -162,24 +158,9 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
                     placeholder="Company name"
                     className="h-9"
                   />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-xs">Keywords (optional)</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {KEYWORD_OPTIONS.slice(0, 6).map(keyword => (
-                      <div key={keyword} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`keyword-${keyword}`}
-                          checked={searchInputs.keywords.includes(keyword)}
-                          onCheckedChange={() => handleKeywordToggle(keyword)}
-                        />
-                        <label htmlFor={`keyword-${keyword}`} className="text-xs cursor-pointer">
-                          {keyword}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-xs text-slate-500">
+                    Results will be automatically categorized
+                  </p>
                 </div>
 
                 <Button
@@ -228,15 +209,22 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
               {searchResults.results.length > 0 && (
                 <div className="space-y-2 mt-3 max-h-64 overflow-y-auto">
                   {searchResults.results.slice(0, 5).map((result, idx) => (
-                    <div key={idx} className="p-3 bg-white dark:bg-slate-800 rounded border text-xs space-y-1">
+                    <div key={idx} className="p-3 bg-white dark:bg-slate-800 rounded border text-xs space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-medium text-slate-900 dark:text-slate-100 line-clamp-2 flex-1">
                           {result.title}
                         </p>
-                        <Badge className={cn("text-xs", SEVERITY_COLORS[result.severity])}>
+                        <Badge className={cn("text-xs flex-shrink-0", SEVERITY_COLORS[result.severity])}>
                           {result.severity}
                         </Badge>
                       </div>
+                      
+                      {result.tag && (
+                        <Badge variant="outline" className={cn("text-xs", TAG_COLORS[result.tag] || TAG_COLORS['Other'])}>
+                          {result.tag}
+                        </Badge>
+                      )}
+                      
                       <p className="text-slate-600 dark:text-slate-400 line-clamp-2">
                         {result.per_article_summary}
                       </p>

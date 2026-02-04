@@ -230,7 +230,14 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
                       </p>
                       <div className="flex items-center justify-between gap-2 text-xs">
                         <span className="text-slate-500">
-                          {result.published_date ? format(new Date(result.published_date), 'dd MMM yyyy') : 'Date unknown'} • {result.publisher || 'Unknown source'}
+                          {(() => {
+                            try {
+                              const date = new Date(result.published_date);
+                              return !isNaN(date.getTime()) ? format(date, 'dd MMM yyyy') : 'Date unknown';
+                            } catch {
+                              return 'Date unknown';
+                            }
+                          })()} • {result.publisher || 'Unknown source'}
                         </span>
                         <a
                           href={result.url}

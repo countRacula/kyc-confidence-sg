@@ -72,10 +72,10 @@ export async function fetchGDELT(query, dateRange) {
     const data = await response.json();
     return (data.articles || []).map(article => ({
       source: 'GDELT',
-      title: article.title,
-      publisher: article.domain,
-      url: article.url,
-      published_date: article.seendate,
+      title: article.title || 'Untitled',
+      publisher: article.domain || 'Unknown',
+      url: article.url || '',
+      published_date: article.seendate || new Date().toISOString(),
       snippet: article.socialimage || ''
     }));
   } catch (error) {
@@ -99,10 +99,10 @@ export async function fetchGoogleNews(query) {
     
     return Array.from(items).slice(0, 20).map(item => ({
       source: 'Google News',
-      title: item.querySelector('title')?.textContent || '',
+      title: item.querySelector('title')?.textContent || 'Untitled',
       publisher: item.querySelector('source')?.textContent || 'Unknown',
       url: item.querySelector('link')?.textContent || '',
-      published_date: item.querySelector('pubDate')?.textContent || '',
+      published_date: item.querySelector('pubDate')?.textContent || new Date().toISOString(),
       snippet: item.querySelector('description')?.textContent || ''
     }));
   } catch (error) {
@@ -142,6 +142,12 @@ export function rankResults(results, locale, limit = 10) {
       // Then by date (more recent first)
       const aDate = new Date(a.published_date);
       const bDate = new Date(b.published_date);
+      
+      // Handle invalid dates
+      if (isNaN(aDate.getTime()) && isNaN(bDate.getTime())) return 0;
+      if (isNaN(aDate.getTime())) return 1;
+      if (isNaN(bDate.getTime())) return -1;
+      
       return bDate - aDate;
     })
     .slice(0, limit);
@@ -207,8 +213,11 @@ export async function generateRollupSummary(summarizedResults) {
     };
 
     const topResults = summarizedResults.slice(0, 3);
-    const mostRecentDate = summarizedResults.length > 0 
-      ? new Date(Math.max(...summarizedResults.map(r => new Date(r.published_date))))
+    const validDates = summarizedResults
+      .map(r => new Date(r.published_date))
+      .filter(d => !isNaN(d.getTime()));
+    const mostRecentDate = validDates.length > 0 
+      ? new Date(Math.max(...validDates))
       : null;
 
     const prompt = `Based on these negative press search results, provide a 2-4 sentence overall assessment:

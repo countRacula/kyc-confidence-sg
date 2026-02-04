@@ -217,72 +217,72 @@ export default function Records() {
           <div className="grid gap-4">
             {filteredRecords.map(record => (
               <Card key={record.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Building2 className="w-6 h-6 text-slate-500" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-slate-900">{record.name}</h3>
-                          {getStatusBadge(record.status)}
-                          {(!record.uen || record.uen === 'PENDING') && (
-                            <Badge variant="outline" className="text-amber-600 border-amber-300">
-                              <AlertCircle className="w-3 h-3 mr-1" />
-                              Incomplete
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex flex-wrap gap-4 text-sm text-slate-500">
-                          <span>UEN: {record.uen || '-'}</span>
-                          <span>Type: {getTypeLabels(record.types)}</span>
-                          {record.start_date && (
-                            <span>Since: {format(new Date(record.start_date), 'MMM yyyy')}</span>
-                          )}
-                        </div>
-                        {record.primary_contact_name && (
-                          <p className="text-sm text-slate-500 mt-1">
-                            Contact: {record.primary_contact_name}
-                            {record.email && ` • ${record.email}`}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Link to={`${createPageUrl('Assessment')}?counterparty=${record.id}`}>
-                        <Button variant="outline" size="sm">
-                          <FileCheck className="w-4 h-4 mr-1" />
-                          Assess
-                        </Button>
-                      </Link>
-                      
-                      {canEdit && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => { setEditingRecord(record); setShowForm(true); }}>
-                              <Pencil className="w-4 h-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => setDeleteRecord(record)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
+               <CardContent className="p-4 md:p-6">
+                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                   <div className="flex items-start gap-3 md:gap-4 min-w-0 flex-1">
+                     <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                       <Building2 className="w-5 h-5 md:w-6 md:h-6 text-slate-500" />
+                     </div>
+                     <div className="min-w-0 flex-1">
+                       <div className="flex flex-wrap items-center gap-2 mb-1">
+                         <h3 className="font-semibold text-slate-900 break-words">{record.name}</h3>
+                         {getStatusBadge(record.status)}
+                         {(!record.uen || record.uen === 'PENDING') && (
+                           <Badge variant="outline" className="text-amber-600 border-amber-300 text-xs">
+                             <AlertCircle className="w-3 h-3 mr-1" />
+                             Incomplete
+                           </Badge>
+                         )}
+                       </div>
+                       <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-slate-500">
+                         <span className="break-all">UEN: {record.uen || '-'}</span>
+                         <span>Type: {getTypeLabels(record.types)}</span>
+                         {record.start_date && (
+                           <span>Since: {format(new Date(record.start_date), 'MMM yyyy')}</span>
+                         )}
+                       </div>
+                       {record.primary_contact_name && (
+                         <p className="text-xs md:text-sm text-slate-500 mt-1 break-words">
+                           Contact: {record.primary_contact_name}
+                           {record.email && ` • ${record.email}`}
+                         </p>
+                       )}
+                     </div>
+                   </div>
+
+                   <div className="flex items-center gap-2 flex-shrink-0">
+                     <Link to={`${createPageUrl('Assessment')}?counterparty=${record.id}`}>
+                       <Button variant="outline" size="sm" className="text-xs md:text-sm">
+                         <FileCheck className="w-4 h-4 mr-1" />
+                         Assess
+                       </Button>
+                     </Link>
+
+                     {canEdit && (
+                       <DropdownMenu>
+                         <DropdownMenuTrigger asChild>
+                           <Button variant="ghost" size="icon">
+                             <MoreVertical className="w-4 h-4" />
+                           </Button>
+                         </DropdownMenuTrigger>
+                         <DropdownMenuContent align="end">
+                           <DropdownMenuItem onClick={() => { setEditingRecord(record); setShowForm(true); }}>
+                             <Pencil className="w-4 h-4 mr-2" />
+                             Edit
+                           </DropdownMenuItem>
+                           <DropdownMenuItem 
+                             onClick={() => setDeleteRecord(record)}
+                             className="text-red-600"
+                           >
+                             <Trash2 className="w-4 h-4 mr-2" />
+                             Delete
+                           </DropdownMenuItem>
+                         </DropdownMenuContent>
+                       </DropdownMenu>
+                     )}
+                   </div>
+                 </div>
+               </CardContent>
               </Card>
             ))}
           </div>

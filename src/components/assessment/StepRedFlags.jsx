@@ -1,11 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, Shield, Newspaper, FileQuestion, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Shield, Newspaper, FileQuestion, Info, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { createPageUrl } from '@/utils';
 
-export default function StepRedFlags({ data, onChange }) {
+export default function StepRedFlags({ data, onChange, counterpartyId, assessmentId }) {
   return (
     <div className="space-y-6">
       <Alert className="bg-amber-50 border-amber-200">
@@ -61,11 +64,30 @@ export default function StepRedFlags({ data, onChange }) {
       {/* Adverse Media */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Newspaper className="w-4 h-4 text-amber-600" />
-            Adverse Media
-          </CardTitle>
-          <CardDescription>Negative news and reputation concerns</CardDescription>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Newspaper className="w-4 h-4 text-amber-600" />
+                Adverse Media
+              </CardTitle>
+              <CardDescription>Negative news and reputation concerns</CardDescription>
+            </div>
+            {counterpartyId && (
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+              >
+                <Link 
+                  to={`${createPageUrl('NegativePressCheck')}?counterparty=${counterpartyId}${assessmentId ? `&assessment=${assessmentId}` : ''}`}
+                  target="_blank"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Run Check
+                </Link>
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -84,7 +106,7 @@ export default function StepRedFlags({ data, onChange }) {
               </SelectContent>
             </Select>
             <p className="text-xs text-slate-500">
-              Search for news about fraud, lawsuits, regulatory issues, etc.
+              Use the "Run Check" button to perform an automated search, or select manually based on your research.
             </p>
           </div>
 

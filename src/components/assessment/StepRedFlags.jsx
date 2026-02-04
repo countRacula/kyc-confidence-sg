@@ -230,7 +230,7 @@ export default function StepRedFlags({ data, onChange, counterparty }) {
                       </p>
                       <div className="flex items-center justify-between gap-2 text-xs">
                         <span className="text-slate-500">
-                          {format(new Date(result.published_date), 'dd MMM yyyy')} • {result.publisher}
+                          {result.published_date ? format(new Date(result.published_date), 'dd MMM yyyy') : 'Date unknown'} • {result.publisher || 'Unknown source'}
                         </span>
                         <a
                           href={result.url}

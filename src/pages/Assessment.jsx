@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, FileCheck, Building2 } from "lucide-react";
 import { base44 } from '@/api/base44Client';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { useAuth } from '@/components/auth/useAuth';
 import AssessmentWizard from '@/components/assessment/AssessmentWizard';
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Assessment() {
   const { user, organisation, loading: authLoading, isAuthenticated, canEdit } = useAuth();
+  const navigate = useNavigate();
   const [counterparties, setCounterparties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [preselectedId, setPreselectedId] = useState(null);
@@ -49,7 +50,7 @@ export default function Assessment() {
   };
 
   const handleComplete = (assessment) => {
-    window.location.href = createPageUrl('Dashboard');
+    navigate(createPageUrl('Dashboard'));
   };
 
   if (authLoading || loading) {

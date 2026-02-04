@@ -53,12 +53,11 @@ export default function Landing() {
               <p className="text-xs text-slate-500">Singapore Edition</p>
             </div>
           </div>
-          <Button 
-            variant="ghost" 
-            onClick={() => base44.auth.redirectToLogin('Onboarding')}
-          >
-            Sign In
-          </Button>
+          <Link to={createPageUrl('Onboarding')}>
+            <Button variant="ghost">
+              Sign In
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -79,14 +78,15 @@ export default function Landing() {
             using local business criteria that matter.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg"
-              onClick={() => base44.auth.redirectToLogin('Onboarding')}
-              className="bg-emerald-600 hover:bg-emerald-700 text-base px-8"
-            >
-              Create Your Free Account
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            <Link to={createPageUrl('Onboarding')}>
+              <Button 
+                size="lg"
+                className="bg-emerald-600 hover:bg-emerald-700 text-base px-8"
+              >
+                Create Your Free Account
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -164,15 +164,16 @@ export default function Landing() {
           <p className="text-emerald-100 mb-8 max-w-xl mx-auto">
             Join Singapore SMEs who use KYC Confidence to make better credit decisions.
           </p>
-          <Button 
-            size="lg"
-            variant="secondary"
-            onClick={() => base44.auth.redirectToLogin('Onboarding')}
-            className="bg-white text-emerald-700 hover:bg-emerald-50"
-          >
-            Create Your Free Account
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          <Link to={createPageUrl('Onboarding')}>
+            <Button 
+              size="lg"
+              variant="secondary"
+              className="bg-white text-emerald-700 hover:bg-emerald-50"
+            >
+              Create Your Free Account
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
         </Card>
       </section>
 

@@ -73,13 +73,29 @@ export default function Dashboard() {
       const clients = counterparties.filter(c => c.types?.includes('client'));
       const suppliers = counterparties.filter(c => c.types?.includes('supplier'));
 
+      // Calculate average scores
+      const calculateAvgScore = (cps) => {
+        const cpIds = cps.map(c => c.id);
+        const relevantAssessments = assessments.filter(a => cpIds.includes(a.counterparty_id));
+        if (relevantAssessments.length === 0) return null;
+        const sum = relevantAssessments.reduce((acc, a) => acc + a.total_score, 0);
+        return Math.round(sum / relevantAssessments.length);
+      };
+
+      const allAvgScore = assessments.length > 0 
+        ? Math.round(assessments.reduce((acc, a) => acc + a.total_score, 0) / assessments.length)
+        : null;
+
       setStats({
         totalRecords: counterparties.length,
         clientsCount: clients.length,
         suppliersCount: suppliers.length,
         assessments30: assessments30.length,
         assessments90: assessments90.length,
-        riskDistribution
+        riskDistribution,
+        avgScoreAll: allAvgScore,
+        avgScoreClients: calculateAvgScore(clients),
+        avgScoreSuppliers: calculateAvgScore(suppliers)
       });
 
       setRecentAssessments(assessments.slice(0, 10));
@@ -148,6 +164,16 @@ export default function Dashboard() {
                      activeTab === 'clients' ? (stats?.clientsCount || 0) : 
                      (stats?.suppliersCount || 0)}
                   </p>
+                  {(() => {
+                    const avgScore = activeTab === 'all' ? stats?.avgScoreAll : 
+                                    activeTab === 'clients' ? stats?.avgScoreClients : 
+                                    stats?.avgScoreSuppliers;
+                    return avgScore !== null && avgScore !== undefined ? (
+                      <p className="text-sm text-slate-500 mt-1">
+                        Avg Score: <span className="font-semibold text-emerald-600">{avgScore}</span>
+                      </p>
+                    ) : null;
+                  })()}
                 </div>
                 <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
                   <Building2 className="w-6 h-6 text-slate-600" />

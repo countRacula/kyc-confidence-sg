@@ -182,7 +182,7 @@ export default function Layout({ children, currentPageName }) {
       </aside>
 
       {/* Main content */}
-      <div className={cn("lg:ml-64", showBottomNav && "pb-20")}>
+      <div className={cn("lg:ml-64", showBottomNav && "pb-20 lg:pb-0")}>
         {/* Mobile-only header */}
         <header className="lg:hidden sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-30 pt-[env(safe-area-inset-top)]">
           <div className="flex items-center gap-3 px-4 py-3">

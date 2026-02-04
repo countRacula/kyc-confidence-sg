@@ -42,10 +42,14 @@ export default function StepResults({ data, counterparty, user, onResultsCalcula
       });
       
       setSaved(true);
-      onSave?.(assessment);
+      setSaving(false);
+      
+      // Delay navigation slightly to show saved state
+      setTimeout(() => {
+        onSave?.(assessment);
+      }, 300);
     } catch (error) {
       console.error('Failed to save assessment:', error);
-    } finally {
       setSaving(false);
     }
   };

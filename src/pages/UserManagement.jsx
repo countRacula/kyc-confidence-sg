@@ -63,14 +63,12 @@ export default function UserManagement() {
       // Create the invitation
       const invite = await base44.users.inviteUser(inviteEmail, inviteRole);
       
-      // Get the invite link
-      const inviteLink = `${window.location.origin}${createPageUrl('AcceptInvite')}?token=${invite.token}`;
-      
-      // Send email with invite link
-      await base44.integrations.Core.SendEmail({
-        to: inviteEmail,
-        subject: `You've been invited to join ${organisation?.name} on KYC Confidence`,
-        body: `Hi,\n\nYou've been invited to join ${organisation?.name} as a ${inviteRole} on KYC Confidence.\n\nAccept your invitation: ${inviteLink}\n\nIf you have any questions, please contact your administrator.\n\nBest regards,\nKYC Confidence Team`
+      // Send email via backend function
+      await base44.functions.invoke('sendInviteEmail', {
+        email: inviteEmail,
+        orgName: organisation?.name,
+        role: inviteRole,
+        inviteToken: invite.token
       });
       
       // Log the action

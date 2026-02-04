@@ -60,7 +60,18 @@ export default function UserManagement() {
     
     setInviting(true);
     try {
-      await base44.users.inviteUser(inviteEmail, inviteRole);
+      // Create the invitation
+      const invite = await base44.users.inviteUser(inviteEmail, inviteRole);
+      
+      // Get the invite link
+      const inviteLink = `${window.location.origin}${createPageUrl('AcceptInvite')}?token=${invite.token}`;
+      
+      // Send email with invite link
+      await base44.integrations.Core.SendEmail({
+        to: inviteEmail,
+        subject: `You've been invited to join ${organisation?.name} on KYC Confidence`,
+        body: `Hi,\n\nYou've been invited to join ${organisation?.name} as a ${inviteRole} on KYC Confidence.\n\nAccept your invitation: ${inviteLink}\n\nIf you have any questions, please contact your administrator.\n\nBest regards,\nKYC Confidence Team`
+      });
       
       // Log the action
       await base44.entities.AuditLog.create({
@@ -73,7 +84,7 @@ export default function UserManagement() {
         timestamp: new Date().toISOString()
       });
       
-      toast.success('Invitation sent');
+      toast.success('Invitation email sent');
       setInviteOpen(false);
       setInviteEmail('');
       setInviteRole('user');

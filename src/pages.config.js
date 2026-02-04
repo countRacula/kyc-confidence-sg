@@ -47,32 +47,32 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import AcceptInvite from './pages/AcceptInvite';
 import Assessment from './pages/Assessment';
 import Dashboard from './pages/Dashboard';
 import FreeAssessment from './pages/FreeAssessment';
 import Landing from './pages/Landing';
+import NegativePressCheck from './pages/NegativePressCheck';
 import Onboarding from './pages/Onboarding';
 import Records from './pages/Records';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
-import NegativePressCheck from './pages/NegativePressCheck';
 import UserManagement from './pages/UserManagement';
-import AcceptInvite from './pages/AcceptInvite';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AcceptInvite": AcceptInvite,
     "Assessment": Assessment,
     "Dashboard": Dashboard,
     "FreeAssessment": FreeAssessment,
     "Landing": Landing,
+    "NegativePressCheck": NegativePressCheck,
     "Onboarding": Onboarding,
     "Records": Records,
     "Reports": Reports,
     "Settings": Settings,
-    "NegativePressCheck": NegativePressCheck,
     "UserManagement": UserManagement,
-    "AcceptInvite": AcceptInvite,
 }
 
 export const pagesConfig = {

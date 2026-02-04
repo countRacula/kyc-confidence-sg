@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Building2, Plus, Search, Filter, MoreVertical, 
-  Pencil, Trash2, FileCheck, Loader2, AlertCircle
+  Pencil, Trash2, FileCheck, Loader2, AlertCircle, Newspaper
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -282,6 +282,12 @@ export default function Records() {
                            <DropdownMenuItem onClick={() => { setEditingRecord(record); setShowForm(true); }}>
                              <Pencil className="w-4 h-4 mr-2" />
                              Edit
+                           </DropdownMenuItem>
+                           <DropdownMenuItem asChild>
+                             <Link to={`${createPageUrl('NegativePressCheck')}?counterparty=${record.id}`}>
+                               <Newspaper className="w-4 h-4 mr-2" />
+                               Negative Press Check
+                             </Link>
                            </DropdownMenuItem>
                            <DropdownMenuItem 
                              onClick={() => setDeleteRecord(record)}

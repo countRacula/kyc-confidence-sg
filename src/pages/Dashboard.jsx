@@ -119,23 +119,23 @@ export default function Dashboard() {
   const totalRiskCount = stats ? Object.values(stats.riskDistribution).reduce((a, b) => a + b, 0) : 0;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-            <p className="text-slate-500">{organisation?.name || 'Your Organisation'}</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Dashboard</h1>
+            <p className="text-slate-500 dark:text-slate-400">{organisation?.name || 'Your Organisation'}</p>
           </div>
           <div className="flex gap-3">
             <Link to={createPageUrl('Records')}>
-              <Button variant="outline">
+              <Button variant="outline" className="select-none">
                 <Plus className="w-4 h-4 mr-2" />
                 Add Record
               </Button>
             </Link>
             <Link to={createPageUrl('Assessment')}>
-              <Button className="bg-emerald-600 hover:bg-emerald-700">
+              <Button className="bg-emerald-600 hover:bg-emerald-700 select-none">
                 <FileCheck className="w-4 h-4 mr-2" />
                 Run Assessment
               </Button>
@@ -145,10 +145,10 @@ export default function Dashboard() {
 
         {/* Record Type Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="clients">Clients</TabsTrigger>
-            <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 max-w-md dark:bg-slate-800">
+            <TabsTrigger value="all" className="select-none">All</TabsTrigger>
+            <TabsTrigger value="clients" className="select-none">Clients</TabsTrigger>
+            <TabsTrigger value="suppliers" className="select-none">Suppliers</TabsTrigger>
           </TabsList>
         </Tabs>
 

@@ -151,18 +151,18 @@ export default function Records() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Records</h1>
-            <p className="text-slate-500">Manage your vendors, suppliers, and clients</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Records</h1>
+            <p className="text-slate-500 dark:text-slate-400">Manage your vendors, suppliers, and clients</p>
           </div>
           {canEdit && (
             <Button 
               onClick={() => { setEditingRecord(null); setShowForm(true); }}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-emerald-600 hover:bg-emerald-700 select-none"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Record

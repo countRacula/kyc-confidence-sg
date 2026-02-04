@@ -179,28 +179,41 @@ export default function Settings() {
 
   const totalWeight = weights.sg_presence + weights.ownership + weights.financial + weights.red_flags;
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      await base44.entities.User.delete(user.id);
+      await base44.auth.logout();
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+      toast.error('Failed to delete account');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
+      <div className="max-w-4xl mx-auto px-6 py-8 pb-24 lg:pb-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-          <p className="text-slate-500">Manage your organisation and team</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Settings</h1>
+          <p className="text-slate-500 dark:text-slate-400">Manage your organisation and team</p>
         </div>
 
         <Tabs defaultValue="organisation">
-          <TabsList className="mb-6">
-            <TabsTrigger value="organisation" className="flex items-center gap-2">
+          <TabsList className="mb-6 dark:bg-slate-800">
+            <TabsTrigger value="organisation" className="flex items-center gap-2 select-none">
               <Building2 className="w-4 h-4" />
               Organisation
             </TabsTrigger>
             {isAdmin && (
-              <TabsTrigger value="team" className="flex items-center gap-2">
+              <TabsTrigger value="team" className="flex items-center gap-2 select-none">
                 <Users className="w-4 h-4" />
                 Team
               </TabsTrigger>
             )}
             {isAdmin && (
-              <TabsTrigger value="scoring" className="flex items-center gap-2">
+              <TabsTrigger value="scoring" className="flex items-center gap-2 select-none">
                 <Scale className="w-4 h-4" />
                 Scoring
               </TabsTrigger>
@@ -249,12 +262,35 @@ export default function Settings() {
                 <CardTitle className="text-base">Your Account</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                   <div>
-                    <p className="font-medium">{user?.full_name || user?.email}</p>
-                    <p className="text-sm text-slate-500">{user?.email}</p>
+                    <p className="font-medium dark:text-slate-200">{user?.full_name || user?.email}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{user?.email}</p>
                   </div>
                   {getRoleBadge(user?.org_role)}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-red-200 dark:border-red-900/50">
+              <CardHeader>
+                <CardTitle className="text-base text-red-600 dark:text-red-400">Danger Zone</CardTitle>
+                <CardDescription>Irreversible actions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/50">
+                  <div>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">Delete Account</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Permanently delete your account and all data</p>
+                  </div>
+                  <Button 
+                    variant="destructive"
+                    onClick={handleDeleteAccount}
+                    className="select-none"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
                 </div>
               </CardContent>
             </Card>

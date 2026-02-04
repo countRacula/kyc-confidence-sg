@@ -23,10 +23,23 @@ export default function Onboarding() {
   }, []);
 
   const checkExistingOrg = async () => {
+    setLoading(true);
     try {
       const user = await base44.auth.me();
       if (user.org_id) {
         window.location.href = createPageUrl('Dashboard');
+        return;
+      }
+
+      // Check for pending invitations
+      const pendingInvites = await base44.users.listPendingInvites();
+      if (pendingInvites && pendingInvites.length > 0) {
+        // Auto-accept the first invitation
+        const invite = pendingInvites[0];
+        await base44.users.acceptInvite(invite.token);
+        window.location.href = createPageUrl('Dashboard');
+      } else {
+        setLoading(false);
       }
     } catch (e) {
       // User not authenticated
@@ -104,6 +117,17 @@ export default function Onboarding() {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto mb-3" />
+          <p className="text-slate-500">Setting up your account...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center p-6">

@@ -27,12 +27,21 @@ export default function StepResults({ data, counterparty, user, onResultsCalcula
     
     setSaving(true);
     try {
+      // Clean up inputs - convert empty strings to null for numeric fields
+      const cleanInputs = { ...data };
+      const numericFields = ['revenue', 'cogs', 'operating_expenses', 'current_assets', 'current_liabilities', 'total_assets', 'total_liabilities'];
+      numericFields.forEach(field => {
+        if (cleanInputs[field] === '' || cleanInputs[field] === undefined) {
+          cleanInputs[field] = null;
+        }
+      });
+
       const assessment = await base44.entities.Assessment.create({
         org_id: user.org_id,
         counterparty_id: counterparty.id,
         counterparty_name: counterparty.name,
         assessor_email: user.email,
-        inputs: data,
+        inputs: cleanInputs,
         computed_metrics: results.computed_metrics,
         component_scores: results.component_scores,
         total_score: results.total_score,

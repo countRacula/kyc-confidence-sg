@@ -16,8 +16,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import PageTransition from '@/components/ui/PageTransition';
-import PullToRefresh from '@/components/ui/PullToRefresh';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 
 export default function UserManagement() {
   const { user, organisation, loading: authLoading, isAdmin } = useAuth();

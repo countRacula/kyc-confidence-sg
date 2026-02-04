@@ -55,7 +55,7 @@ export default function Landing() {
           </div>
           <Button 
             variant="ghost" 
-            onClick={() => base44.auth.redirectToLogin(createPageUrl('Dashboard'))}
+            onClick={() => base44.auth.redirectToLogin('Dashboard')}
           >
             Sign In
           </Button>
@@ -81,7 +81,7 @@ export default function Landing() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg"
-              onClick={() => base44.auth.redirectToLogin(createPageUrl('Dashboard'))}
+              onClick={() => base44.auth.redirectToLogin('Dashboard')}
               className="bg-emerald-600 hover:bg-emerald-700 text-base px-8"
             >
               Create Your Free Account
@@ -167,7 +167,7 @@ export default function Landing() {
           <Button 
             size="lg"
             variant="secondary"
-            onClick={() => base44.auth.redirectToLogin(createPageUrl('Dashboard'))}
+            onClick={() => base44.auth.redirectToLogin('Dashboard')}
             className="bg-white text-emerald-700 hover:bg-emerald-50"
           >
             Create Your Free Account

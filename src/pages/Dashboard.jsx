@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [recentAssessments, setRecentAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -32,7 +33,19 @@ export default function Dashboard() {
     if (user?.org_id) {
       loadDashboardData();
     }
-  }, [authLoading, isAuthenticated, user]);
+  }, [authLoading, isAuthenticated, user, refreshKey]);
+
+  // Refresh data when page becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user?.org_id) {
+        setRefreshKey(prev => prev + 1);
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user]);
 
   const loadDashboardData = async () => {
     try {

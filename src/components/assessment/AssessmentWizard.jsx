@@ -65,6 +65,10 @@ export default function AssessmentWizard({
     }
   }, [preselectedCounterpartyId, counterparties]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
+
   const handleCounterpartySelect = (counterparty) => {
     setSelectedCounterparty(counterparty);
     // Pre-fill ownership data from counterparty

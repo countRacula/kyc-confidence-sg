@@ -55,6 +55,7 @@ import Onboarding from './pages/Onboarding';
 import Records from './pages/Records';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import NegativePressCheck from './pages/NegativePressCheck';
 import __Layout from './Layout.jsx';
 
 
@@ -67,6 +68,7 @@ export const PAGES = {
     "Records": Records,
     "Reports": Reports,
     "Settings": Settings,
+    "NegativePressCheck": NegativePressCheck,
 }
 
 export const pagesConfig = {

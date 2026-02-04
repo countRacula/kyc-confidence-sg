@@ -23,6 +23,7 @@ export default function AssessmentWizard({
   counterparties, 
   preselectedCounterpartyId,
   user,
+  organisation,
   onComplete 
 }) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -132,6 +133,7 @@ export default function AssessmentWizard({
           <StepFinancials
             data={assessmentData}
             onChange={handleDataChange}
+            orgSizeType={organisation?.org_size_type || 'SME'}
           />
         );
       case 3:

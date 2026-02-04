@@ -1,5 +1,7 @@
 // KYC Credit Confidence Scoring Engine for Singapore SMEs
 
+import { getRangeMidpoint, generateFinancialRanges, generateMonthlyExpenseRanges, parseNumericInput } from '../assessment/financialRanges';
+
 export function calculateCompanyAge(startDate) {
   if (!startDate) return null;
   const start = new Date(startDate);
@@ -147,158 +149,238 @@ export function calculateOwnershipScore(inputs) {
 export function calculateFinancialScore(inputs) {
   const reasons = [];
   const metrics = {};
+  const subscores = {};
   let score = 0;
   const missingData = [];
 
-  const revenue = parseFloat(inputs.revenue) || 0;
-  const cogs = inputs.is_service_business ? 0 : (parseFloat(inputs.cogs) || 0);
-  const opex = parseFloat(inputs.operating_expenses) || 0;
-  const currentAssets = parseFloat(inputs.current_assets) || 0;
-  const currentLiabilities = parseFloat(inputs.current_liabilities) || 0;
-  const totalLiabilities = parseFloat(inputs.total_liabilities) || 0;
-  const totalAssets = parseFloat(inputs.total_assets) || 0;
+  const financialRanges = generateFinancialRanges();
+  const monthlyExpenseRanges = generateMonthlyExpenseRanges();
 
-  // Net Margin (max 10)
-  if (revenue > 0) {
-    const netMargin = ((revenue - cogs - opex) / revenue) * 100;
-    metrics.net_margin = netMargin;
-    
-    if (netMargin > 10) {
-      score += 10;
-      reasons.push(`+10: Strong net margin (${netMargin.toFixed(1)}%)`);
-    } else if (netMargin >= 5) {
-      score += 7;
-      reasons.push(`+7: Good net margin (${netMargin.toFixed(1)}%)`);
-    } else if (netMargin >= 0) {
-      score += 4;
-      reasons.push(`+4: Low net margin (${netMargin.toFixed(1)}%)`);
-    } else if (netMargin >= -10) {
-      score += 1;
-      reasons.push(`+1: Negative margin (${netMargin.toFixed(1)}%)`);
+  // Extract numeric values from ranges or direct inputs
+  const revenue = inputs.revenue_range 
+    ? getRangeMidpoint(inputs.revenue_range, financialRanges)
+    : parseNumericInput(inputs.revenue);
+  
+  const profitFlag = inputs.profit_flag;
+  const profitAmount = inputs.profit_amount_range
+    ? getRangeMidpoint(inputs.profit_amount_range, financialRanges)
+    : parseNumericInput(inputs.profit_amount);
+
+  const cash = inputs.cash_range
+    ? getRangeMidpoint(inputs.cash_range, financialRanges)
+    : parseNumericInput(inputs.cash);
+
+  const receivables = inputs.receivables_range
+    ? getRangeMidpoint(inputs.receivables_range, financialRanges)
+    : parseNumericInput(inputs.receivables);
+
+  const currentAssets = inputs.current_assets_range
+    ? getRangeMidpoint(inputs.current_assets_range, financialRanges)
+    : parseNumericInput(inputs.current_assets);
+
+  const totalAssets = inputs.total_assets_range
+    ? getRangeMidpoint(inputs.total_assets_range, financialRanges)
+    : parseNumericInput(inputs.total_assets);
+
+  const billsDueSoon = inputs.bills_due_soon_range
+    ? getRangeMidpoint(inputs.bills_due_soon_range, financialRanges)
+    : parseNumericInput(inputs.bills_due_soon);
+
+  const totalLiabilities = inputs.total_liabilities_range
+    ? getRangeMidpoint(inputs.total_liabilities_range, financialRanges)
+    : parseNumericInput(inputs.total_liabilities);
+
+  const monthlyExpenses = inputs.monthly_expenses_range
+    ? getRangeMidpoint(inputs.monthly_expenses_range, monthlyExpenseRanges)
+    : parseNumericInput(inputs.monthly_expenses);
+
+  // 1. PROFITABILITY SCORE (0-10)
+  let profitabilityScore = 4; // default
+  if (profitFlag && revenue > 0 && profitAmount > 0) {
+    // Have both flag and amount
+    const actualProfit = profitFlag === 'loss' ? -profitAmount : profitAmount;
+    const margin = (actualProfit / revenue) * 100;
+    metrics.profit_margin = margin;
+
+    if (margin > 10) {
+      profitabilityScore = 10;
+      reasons.push(`Profitability: Strong margin (${margin.toFixed(1)}%) - excellent`);
+    } else if (margin >= 5) {
+      profitabilityScore = 8;
+      reasons.push(`Profitability: Good margin (${margin.toFixed(1)}%)`);
+    } else if (margin >= 0) {
+      profitabilityScore = 6;
+      reasons.push(`Profitability: Low margin (${margin.toFixed(1)}%)`);
+    } else if (margin >= -10) {
+      profitabilityScore = 3;
+      reasons.push(`Profitability: Small loss (${margin.toFixed(1)}%)`);
     } else {
-      reasons.push(`+0: Severe loss (${netMargin.toFixed(1)}%)`);
+      profitabilityScore = 1;
+      reasons.push(`Profitability: Significant loss (${margin.toFixed(1)}%)`);
+    }
+  } else if (profitFlag) {
+    // Only have flag
+    if (profitFlag === 'profit') {
+      profitabilityScore = 8;
+      reasons.push('Profitability: You indicated Profit (healthy)');
+    } else if (profitFlag === 'breakeven') {
+      profitabilityScore = 6;
+      reasons.push('Profitability: Break-even (acceptable)');
+    } else if (profitFlag === 'loss') {
+      profitabilityScore = 2;
+      reasons.push('Profitability: You indicated Loss (concern)');
+    } else {
+      profitabilityScore = 4;
+      reasons.push('Profitability: Unknown (conservative score)');
     }
   } else {
-    score += 4;
-    missingData.push('Revenue');
-    reasons.push('+4: Revenue data missing (conservative score)');
+    missingData.push('Profit/Loss status');
+    reasons.push('Profitability: Missing data (conservative score)');
   }
+  subscores.profitability = profitabilityScore;
 
-  // Current Ratio (max 10)
-  if (currentAssets > 0 || currentLiabilities > 0) {
-    if (currentLiabilities === 0) {
-      metrics.current_ratio = 999;
-      score += 10;
-      reasons.push('+10: No current liabilities declared');
+  // 2. LIQUIDITY SCORE (0-10)
+  let liquidityScore = 4; // default
+  let liquidityRatio = null;
+
+  // Preferred: Current Assets vs Bills Due Soon
+  if (currentAssets > 0 && billsDueSoon > 0) {
+    liquidityRatio = currentAssets / billsDueSoon;
+    metrics.liquidity_ratio = liquidityRatio;
+
+    if (liquidityRatio >= 1.5) {
+      liquidityScore = 10;
+      reasons.push(`Liquidity: Strong buffer (${liquidityRatio.toFixed(2)}x)`);
+    } else if (liquidityRatio >= 1.2) {
+      liquidityScore = 7;
+      reasons.push(`Liquidity: Good buffer (${liquidityRatio.toFixed(2)}x)`);
+    } else if (liquidityRatio >= 1.0) {
+      liquidityScore = 5;
+      reasons.push(`Liquidity: Adequate buffer (${liquidityRatio.toFixed(2)}x)`);
+    } else if (liquidityRatio >= 0.8) {
+      liquidityScore = 2;
+      reasons.push(`Liquidity: Tight buffer (${liquidityRatio.toFixed(2)}x)`);
     } else {
-      const currentRatio = currentAssets / currentLiabilities;
-      metrics.current_ratio = currentRatio;
-      
-      if (currentRatio >= 1.5) {
-        score += 10;
-        reasons.push(`+10: Strong liquidity (${currentRatio.toFixed(2)}x)`);
-      } else if (currentRatio >= 1.2) {
-        score += 7;
-        reasons.push(`+7: Good liquidity (${currentRatio.toFixed(2)}x)`);
-      } else if (currentRatio >= 1.0) {
-        score += 5;
-        reasons.push(`+5: Adequate liquidity (${currentRatio.toFixed(2)}x)`);
-      } else if (currentRatio >= 0.8) {
-        score += 2;
-        reasons.push(`+2: Low liquidity (${currentRatio.toFixed(2)}x)`);
-      } else {
-        reasons.push(`+0: Very low liquidity (${currentRatio.toFixed(2)}x)`);
-      }
+      liquidityScore = 0;
+      reasons.push(`Liquidity: Very tight buffer (${liquidityRatio.toFixed(2)}x)`);
     }
-  } else {
-    score += 4;
-    missingData.push('Current Assets/Liabilities');
-    reasons.push('+4: Liquidity data missing (conservative score)');
-  }
+  } else if ((cash > 0 || receivables > 0) && billsDueSoon > 0) {
+    // Fallback: Cash + Receivables vs Bills Due Soon
+    const liquidAssets = (cash || 0) + (receivables || 0);
+    liquidityRatio = liquidAssets / billsDueSoon;
+    metrics.liquidity_ratio = liquidityRatio;
 
-  // Debt Ratio (max 10)
-  if (totalLiabilities > 0) {
-    let debtRatio, debtRatioType;
-    
-    if (totalAssets > 0) {
-      debtRatio = totalLiabilities / totalAssets;
-      debtRatioType = 'assets';
-      metrics.debt_ratio = debtRatio;
-      metrics.debt_ratio_type = 'assets';
-      
-      if (debtRatio < 0.4) {
-        score += 10;
-        reasons.push(`+10: Low leverage (${(debtRatio * 100).toFixed(0)}% debt/assets)`);
-      } else if (debtRatio <= 0.6) {
-        score += 7;
-        reasons.push(`+7: Moderate leverage (${(debtRatio * 100).toFixed(0)}% debt/assets)`);
-      } else if (debtRatio <= 0.8) {
-        score += 4;
-        reasons.push(`+4: High leverage (${(debtRatio * 100).toFixed(0)}% debt/assets)`);
-      } else {
-        score += 1;
-        reasons.push(`+1: Very high leverage (${(debtRatio * 100).toFixed(0)}% debt/assets)`);
-      }
-    } else if (revenue > 0) {
-      debtRatio = totalLiabilities / revenue;
-      debtRatioType = 'revenue';
-      metrics.debt_ratio = debtRatio;
-      metrics.debt_ratio_type = 'revenue';
-      
-      if (debtRatio < 0.3) {
-        score += 10;
-        reasons.push(`+10: Low debt burden (${(debtRatio * 100).toFixed(0)}% debt/revenue)`);
-      } else if (debtRatio <= 0.6) {
-        score += 7;
-        reasons.push(`+7: Moderate debt burden (${(debtRatio * 100).toFixed(0)}% debt/revenue)`);
-      } else if (debtRatio <= 1.0) {
-        score += 4;
-        reasons.push(`+4: High debt burden (${(debtRatio * 100).toFixed(0)}% debt/revenue)`);
-      } else {
-        score += 1;
-        reasons.push(`+1: Very high debt burden (${(debtRatio * 100).toFixed(0)}% debt/revenue)`);
-      }
+    if (liquidityRatio >= 1.5) {
+      liquidityScore = 10;
+      reasons.push(`Liquidity: Strong cash position (${liquidityRatio.toFixed(2)}x)`);
+    } else if (liquidityRatio >= 1.2) {
+      liquidityScore = 7;
+      reasons.push(`Liquidity: Good cash position (${liquidityRatio.toFixed(2)}x)`);
+    } else if (liquidityRatio >= 1.0) {
+      liquidityScore = 5;
+      reasons.push(`Liquidity: Adequate cash position (${liquidityRatio.toFixed(2)}x)`);
+    } else if (liquidityRatio >= 0.8) {
+      liquidityScore = 2;
+      reasons.push(`Liquidity: Tight cash position (${liquidityRatio.toFixed(2)}x)`);
     } else {
-      score += 4;
-      missingData.push('Total Assets or Revenue for debt ratio');
-      reasons.push('+4: Debt ratio cannot be calculated (conservative score)');
+      liquidityScore = 0;
+      reasons.push(`Liquidity: Very tight cash position (${liquidityRatio.toFixed(2)}x)`);
     }
+  } else if (billsDueSoon === 0 && (currentAssets > 0 || cash > 0)) {
+    liquidityScore = 10;
+    reasons.push('Liquidity: No bills due soon declared (strong position)');
   } else {
-    score += 10;
-    reasons.push('+10: No total liabilities reported');
+    missingData.push('Assets or Bills Due Soon');
+    reasons.push('Liquidity: Missing data (conservative score)');
   }
+  subscores.liquidity = liquidityScore;
 
-  // Operating Buffer (max 10)
-  if (currentAssets > 0 && opex > 0) {
-    const monthlyOpex = opex / 12;
-    const bufferMonths = currentAssets / monthlyOpex;
-    metrics.operating_buffer_months = bufferMonths;
-    
+  // 3. SOLVENCY SCORE (0-10)
+  let solvencyScore = 4; // default
+  let debtRatio = null;
+
+  if (totalAssets > 0 && totalLiabilities > 0) {
+    // Preferred: Debt Ratio
+    debtRatio = totalLiabilities / totalAssets;
+    metrics.debt_ratio = debtRatio;
+    metrics.debt_ratio_type = 'assets';
+
+    if (debtRatio < 0.4) {
+      solvencyScore = 10;
+      reasons.push(`Solvency: Low leverage (${(debtRatio * 100).toFixed(0)}% debt/assets)`);
+    } else if (debtRatio <= 0.6) {
+      solvencyScore = 7;
+      reasons.push(`Solvency: Moderate leverage (${(debtRatio * 100).toFixed(0)}% debt/assets)`);
+    } else if (debtRatio <= 0.8) {
+      solvencyScore = 4;
+      reasons.push(`Solvency: High leverage (${(debtRatio * 100).toFixed(0)}% debt/assets)`);
+    } else {
+      solvencyScore = 1;
+      reasons.push(`Solvency: Very high leverage (${(debtRatio * 100).toFixed(0)}% debt/assets)`);
+    }
+  } else if (totalLiabilities > 0 && revenue > 0) {
+    // Fallback: Debt Load (liabilities/revenue)
+    const debtLoad = totalLiabilities / revenue;
+    metrics.debt_load = debtLoad;
+    metrics.debt_ratio_type = 'revenue';
+
+    if (debtLoad < 0.3) {
+      solvencyScore = 10;
+      reasons.push(`Solvency: Low debt burden (${(debtLoad * 100).toFixed(0)}% debt/revenue)`);
+    } else if (debtLoad <= 0.6) {
+      solvencyScore = 7;
+      reasons.push(`Solvency: Moderate debt burden (${(debtLoad * 100).toFixed(0)}% debt/revenue)`);
+    } else if (debtLoad <= 1.0) {
+      solvencyScore = 4;
+      reasons.push(`Solvency: High debt burden (${(debtLoad * 100).toFixed(0)}% debt/revenue)`);
+    } else {
+      solvencyScore = 1;
+      reasons.push(`Solvency: Very high debt burden (${(debtLoad * 100).toFixed(0)}% debt/revenue)`);
+    }
+  } else if (totalLiabilities === 0 || !totalLiabilities) {
+    solvencyScore = 10;
+    reasons.push('Solvency: No liabilities reported (strong position)');
+  } else {
+    missingData.push('Assets or Liabilities for solvency');
+    reasons.push('Solvency: Missing data (conservative score)');
+  }
+  subscores.solvency = solvencyScore;
+
+  // 4. CASH BUFFER SCORE (0-10)
+  let cashBufferScore = 4; // default
+  if (cash > 0 && monthlyExpenses > 0) {
+    const bufferMonths = cash / monthlyExpenses;
+    metrics.cash_buffer_months = bufferMonths;
+
     if (bufferMonths >= 6) {
-      score += 10;
-      reasons.push(`+10: Strong operating buffer (${bufferMonths.toFixed(1)} months)`);
+      cashBufferScore = 10;
+      reasons.push(`Cash Buffer: Excellent (${bufferMonths.toFixed(1)} months)`);
     } else if (bufferMonths >= 3) {
-      score += 7;
-      reasons.push(`+7: Good operating buffer (${bufferMonths.toFixed(1)} months)`);
+      cashBufferScore = 7;
+      reasons.push(`Cash Buffer: Good (${bufferMonths.toFixed(1)} months)`);
     } else if (bufferMonths >= 1) {
-      score += 4;
-      reasons.push(`+4: Limited operating buffer (${bufferMonths.toFixed(1)} months)`);
+      cashBufferScore = 4;
+      reasons.push(`Cash Buffer: Limited (${bufferMonths.toFixed(1)} months)`);
     } else {
-      score += 1;
-      reasons.push(`+1: Very limited buffer (${bufferMonths.toFixed(1)} months)`);
+      cashBufferScore = 1;
+      reasons.push(`Cash Buffer: Very limited (${bufferMonths.toFixed(1)} months)`);
     }
   } else {
-    score += 4;
-    if (!currentAssets) missingData.push('Current Assets for buffer');
-    if (!opex) missingData.push('Operating Expenses for buffer');
-    reasons.push('+4: Operating buffer cannot be calculated (conservative score)');
+    if (!cash) missingData.push('Cash balance');
+    if (!monthlyExpenses) missingData.push('Monthly expenses');
+    reasons.push('Cash Buffer: Missing data (conservative score)');
   }
+  subscores.cash_buffer = cashBufferScore;
 
-  return { 
-    score: Math.min(score, 40), 
-    reasons, 
+  // TOTAL FINANCIAL SCORE (out of 40)
+  score = profitabilityScore + liquidityScore + solvencyScore + cashBufferScore;
+
+  return {
+    score: Math.min(score, 40),
+    reasons,
     metrics,
-    missingData 
+    subscores,
+    missingData
   };
 }
 
@@ -357,11 +439,11 @@ export function generateRecommendedActions(componentScores, financialMetrics, in
     actions.push('Consider shorter payment terms (Net 7-14 instead of Net 30)');
   }
 
-  if (financialMetrics.current_ratio && financialMetrics.current_ratio < 1.2) {
+  if (financialMetrics.liquidity_ratio && financialMetrics.liquidity_ratio < 1.2) {
     actions.push('Start with smaller credit limit and increase gradually');
   }
 
-  if (financialMetrics.operating_buffer_months && financialMetrics.operating_buffer_months < 3) {
+  if (financialMetrics.cash_buffer_months && financialMetrics.cash_buffer_months < 3) {
     actions.push('Monitor payment behavior closely for first 3 months');
   }
 
@@ -475,6 +557,7 @@ export function runFullAssessment(inputs, counterparty) {
     hard_stop_reason: null,
     component_scores: componentScores,
     computed_metrics: financialResult.metrics,
+    financial_subscores: financialResult.subscores,
     reasons: allReasons,
     recommended_actions: recommendedActions,
     missing_data: financialResult.missingData

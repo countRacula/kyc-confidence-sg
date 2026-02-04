@@ -47,26 +47,26 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import Assessment from './pages/Assessment';
+import Dashboard from './pages/Dashboard';
+import FreeAssessment from './pages/FreeAssessment';
 import Landing from './pages/Landing';
 import Onboarding from './pages/Onboarding';
-import Dashboard from './pages/Dashboard';
 import Records from './pages/Records';
-import Assessment from './pages/Assessment';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
-import FreeAssessment from './pages/FreeAssessment';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "Assessment": Assessment,
+    "Dashboard": Dashboard,
+    "FreeAssessment": FreeAssessment,
     "Landing": Landing,
     "Onboarding": Onboarding,
-    "Dashboard": Dashboard,
     "Records": Records,
-    "Assessment": Assessment,
     "Reports": Reports,
     "Settings": Settings,
-    "FreeAssessment": FreeAssessment,
 }
 
 export const pagesConfig = {

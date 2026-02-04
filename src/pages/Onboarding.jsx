@@ -13,7 +13,8 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     orgName: '',
-    industry: ''
+    industry: '',
+    orgSizeType: 'SME'
   });
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function Onboarding() {
       const org = await base44.entities.Organisation.create({
         name: formData.orgName.trim(),
         industry: formData.industry || null,
+        org_size_type: formData.orgSizeType,
         settings: {
           sg_presence_weight: 30,
           ownership_weight: 30,
@@ -121,6 +123,25 @@ export default function Onboarding() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="orgSizeType">Organisation Size *</Label>
+              <Select
+                value={formData.orgSizeType}
+                onValueChange={(value) => setFormData({ ...formData, orgSizeType: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SME">SME (Range-based financial inputs)</SelectItem>
+                  <SelectItem value="Enterprise">Enterprise (Exact financial figures)</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-slate-500">
+                SMEs use range selections for easier data entry. Enterprises enter precise figures.
+              </p>
             </div>
 
             <div className="bg-emerald-50 rounded-lg p-4">

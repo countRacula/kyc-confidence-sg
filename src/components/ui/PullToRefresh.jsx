@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 export function PullToRefresh({ onRefresh, children }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [canRefresh, setCanRefresh] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef(null);
   const startY = useRef(0);
   const currentY = useRef(0);
@@ -15,8 +16,17 @@ export function PullToRefresh({ onRefresh, children }) {
   const threshold = 80;
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || !isMobile) return;
 
     const handleTouchStart = (e) => {
       if (container.scrollTop === 0 && !isRefreshing) {
@@ -69,10 +79,15 @@ export function PullToRefresh({ onRefresh, children }) {
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [canRefresh, isRefreshing, onRefresh, pullDistance]);
+  }, [canRefresh, isRefreshing, onRefresh, pullDistance, isMobile]);
+
+  // On desktop, just render children without pull-to-refresh
+  if (!isMobile) {
+    return <>{children}</>;
+  }
 
   return (
-    <div ref={containerRef} className="relative h-full overflow-auto overscroll-none">
+    <div ref={containerRef} className="relative overscroll-none">
       <motion.div
         style={{ 
           y: pullDistance,
@@ -84,12 +99,13 @@ export function PullToRefresh({ onRefresh, children }) {
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
-          paddingBottom: 10
+          paddingBottom: 10,
+          zIndex: 10
         }}
       >
         <motion.div style={{ opacity, scale }}>
           <Loader2 className={cn(
-            "w-6 h-6 text-emerald-600",
+            "w-6 h-6 text-emerald-600 dark:text-emerald-400",
             isRefreshing && "animate-spin"
           )} />
         </motion.div>

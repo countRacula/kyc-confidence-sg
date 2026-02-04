@@ -102,13 +102,18 @@ export default function Records() {
 
   const handleDelete = async () => {
     if (!deleteRecord) return;
+    
+    // Optimistic update
+    const recordId = deleteRecord.id;
+    setCounterparties(prev => prev.filter(r => r.id !== recordId));
+    setDeleteRecord(null);
+    
     try {
-      await base44.entities.Counterparty.delete(deleteRecord.id);
-      await loadData();
+      await base44.entities.Counterparty.delete(recordId);
     } catch (error) {
       console.error('Failed to delete:', error);
-    } finally {
-      setDeleteRecord(null);
+      // Revert on error
+      await loadData();
     }
   };
 
@@ -151,7 +156,7 @@ export default function Records() {
   }
 
   const handleRefresh = async () => {
-    await loadRecords();
+    await loadData();
   };
 
   return (
@@ -222,7 +227,7 @@ export default function Records() {
         {filteredRecords.length > 0 ? (
           <div className="grid gap-4">
             {filteredRecords.map(record => (
-              <Card key={record.id} className="hover:shadow-md transition-shadow">
+              <Card key={record.id} className="hover:shadow-md transition-shadow min-h-[44px]">
                <CardContent className="p-4 md:p-6">
                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                    <div className="flex items-start gap-3 md:gap-4 min-w-0 flex-1">
@@ -373,7 +378,9 @@ export default function Records() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
-    </div>
+          </div>
+        </div>
+      </PullToRefresh>
+    </PageTransition>
   );
 }

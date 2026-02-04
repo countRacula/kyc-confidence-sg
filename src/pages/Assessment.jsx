@@ -7,6 +7,7 @@ import { createPageUrl } from '@/utils';
 import { useAuth } from '@/components/auth/useAuth';
 import AssessmentWizard from '@/components/assessment/AssessmentWizard';
 import { Button } from "@/components/ui/button";
+import { PageTransition } from '@/components/ui/PageTransition';
 
 export default function Assessment() {
   const { user, organisation, loading: authLoading, isAuthenticated, canEdit } = useAuth();
@@ -108,21 +109,23 @@ export default function Assessment() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Assessment</h1>
-          <p className="text-slate-500 dark:text-slate-400">Run a KYC credit confidence assessment</p>
-        </div>
+    <PageTransition>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Assessment</h1>
+            <p className="text-slate-500 dark:text-slate-400">Run a KYC credit confidence assessment</p>
+          </div>
 
-        <AssessmentWizard
-          counterparties={counterparties}
-          preselectedCounterpartyId={preselectedId}
-          user={user}
-          organisation={organisation}
-          onComplete={handleComplete}
-        />
+          <AssessmentWizard
+            counterparties={counterparties}
+            preselectedCounterpartyId={preselectedId}
+            user={user}
+            organisation={organisation}
+            onComplete={handleComplete}
+          />
+        </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

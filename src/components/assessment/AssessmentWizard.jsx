@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Check, ArrowRight, ArrowLeft, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from 'framer-motion';
 
 import StepSelectCounterparty from './StepSelectCounterparty';
 import StepSGPresence from './StepSGPresence';
@@ -233,7 +234,17 @@ export default function AssessmentWizard({
           <CardDescription>{STEPS[currentStep].description}</CardDescription>
         </CardHeader>
         <CardContent>
-          {renderStepContent()}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {renderStepContent()}
+            </motion.div>
+          </AnimatePresence>
         </CardContent>
       </Card>
 
@@ -244,6 +255,7 @@ export default function AssessmentWizard({
             variant="outline"
             onClick={handleBack}
             disabled={currentStep === 0}
+            className="min-h-[44px]"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -251,7 +263,7 @@ export default function AssessmentWizard({
           <Button
             onClick={handleNext}
             disabled={!canProceed()}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-emerald-600 hover:bg-emerald-700 min-h-[44px]"
           >
             {currentStep === 3 ? 'Calculate Score' : 'Next'}
             <ArrowRight className="w-4 h-4 ml-2" />

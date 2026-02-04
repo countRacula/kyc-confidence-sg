@@ -14,6 +14,8 @@ import { createPageUrl } from '@/utils';
 import { useAuth } from '@/components/auth/useAuth';
 import RiskBadge from '@/components/ui/RiskBadge';
 import { format, subDays, isAfter, parseISO } from 'date-fns';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { PageTransition } from '@/components/ui/PageTransition';
 
 export default function Reports() {
   const { user, organisation, loading: authLoading, isAuthenticated } = useAuth();
@@ -172,16 +174,22 @@ export default function Reports() {
     return sortDir === 'asc' ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />;
   };
 
+  const handleRefresh = async () => {
+    await loadData();
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <PageTransition>
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
+          <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">Reports</h1>
-            <p className="text-slate-500">Assessment history and risk analysis</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Reports</h1>
+            <p className="text-slate-500 dark:text-slate-400">Assessment history and risk analysis</p>
           </div>
-          <Button variant="outline" onClick={exportCSV}>
+          <Button variant="outline" onClick={exportCSV} className="select-none">
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>
@@ -367,11 +375,11 @@ export default function Reports() {
                   </TableHeader>
                   <TableBody>
                     {sortedAssessments.map(a => (
-                      <TableRow key={a.id}>
+                      <TableRow key={a.id} className="min-h-[44px]">
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Building2 className="w-4 h-4 text-slate-400" />
-                            {a.counterparty_name}
+                            <Building2 className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                            <span className="dark:text-slate-200">{a.counterparty_name}</span>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -399,7 +407,9 @@ export default function Reports() {
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+          </div>
+        </div>
+      </PullToRefresh>
+    </PageTransition>
   );
 }

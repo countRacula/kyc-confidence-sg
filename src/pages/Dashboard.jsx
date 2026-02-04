@@ -12,6 +12,8 @@ import { createPageUrl } from '@/utils';
 import { useAuth } from '@/components/auth/useAuth';
 import RiskBadge from '@/components/ui/RiskBadge';
 import { format, subDays } from 'date-fns';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
+import { PageTransition } from '@/components/ui/PageTransition';
 
 export default function Dashboard() {
   const { user, organisation, loading: authLoading, isAuthenticated } = useAuth();
@@ -118,9 +120,15 @@ export default function Dashboard() {
 
   const totalRiskCount = stats ? Object.values(stats.riskDistribution).reduce((a, b) => a + b, 0) : 0;
 
+  const handleRefresh = async () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <PageTransition>
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
+          <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
@@ -358,7 +366,9 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
+          </div>
+        </div>
+      </PullToRefresh>
+    </PageTransition>
   );
 }

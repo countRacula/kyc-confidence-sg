@@ -87,11 +87,11 @@ export default function Layout({ children, currentPageName }) {
         />
       )}
 
-      {/* Sidebar - hidden on mobile when bottom nav is shown */}
+      {/* Sidebar - always visible on desktop, toggleable on mobile */}
       <aside className={cn(
-        "fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-50 transform transition-transform lg:translate-x-0",
-        showBottomNav ? "hidden lg:block" : "",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        "fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 z-50 transform transition-transform",
+        "lg:translate-x-0 lg:block",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -183,48 +183,33 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Main content */}
       <div className={cn("lg:ml-64", showBottomNav && "pb-20")}>
-        {/* Mobile header - shown when bottom nav is displayed */}
-        <header className={cn(
-          "lg:hidden sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-30 pt-[env(safe-area-inset-top)]",
-          showBottomNav ? "block" : "hidden"
-        )}>
-          <div className="flex items-center justify-between px-4 py-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 select-none"
-            >
-              <Menu className="w-6 h-6 text-slate-600 dark:text-slate-300" />
-            </button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-semibold text-slate-900 dark:text-slate-100">KYC Confidence</span>
-            </div>
-            <div className="w-10" /> {/* Spacer */}
-          </div>
-        </header>
-
-        {/* Mobile header - shown for pages without bottom nav (like Assessment) */}
-        <header className={cn(
-          "lg:hidden sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-30 pt-[env(safe-area-inset-top)]",
-          showBottomNav ? "hidden" : "block"
-        )}>
+        {/* Mobile-only header */}
+        <header className="lg:hidden sticky top-0 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 z-30 pt-[env(safe-area-inset-top)]">
           <div className="flex items-center gap-3 px-4 py-3">
-            <button
-              onClick={() => window.history.back()}
-              className="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 select-none"
-            >
-              <svg className="w-6 h-6 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
+            {showBottomNav ? (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 select-none"
+              >
+                <Menu className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+              </button>
+            ) : (
+              <button
+                onClick={() => window.history.back()}
+                className="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 select-none"
+              >
+                <svg className="w-6 h-6 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center">
                 <Shield className="w-4 h-4 text-white" />
               </div>
               <span className="font-semibold text-slate-900 dark:text-slate-100">KYC Confidence</span>
             </div>
+            {showBottomNav && <div className="w-10" />}
           </div>
         </header>
 

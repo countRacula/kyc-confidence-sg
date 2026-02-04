@@ -44,13 +44,13 @@ export default function FreeAssessment() {
   const handleSubmit = () => {
     const inputs = {
       ...formData,
-      revenue: parseFloat(formData.revenue) || 0,
-      cogs: parseFloat(formData.cogs) || 0,
-      operating_expenses: parseFloat(formData.operating_expenses) || 0,
-      current_assets: parseFloat(formData.current_assets) || 0,
-      current_liabilities: parseFloat(formData.current_liabilities) || 0,
-      total_assets: parseFloat(formData.total_assets) || 0,
-      total_liabilities: parseFloat(formData.total_liabilities) || 0,
+      revenue: parseFloat(formData.revenue?.replace(/,/g, '')) || 0,
+      cogs: parseFloat(formData.cogs?.replace(/,/g, '')) || 0,
+      operating_expenses: parseFloat(formData.operating_expenses?.replace(/,/g, '')) || 0,
+      current_assets: parseFloat(formData.current_assets?.replace(/,/g, '')) || 0,
+      current_liabilities: parseFloat(formData.current_liabilities?.replace(/,/g, '')) || 0,
+      total_assets: parseFloat(formData.total_assets?.replace(/,/g, '')) || 0,
+      total_liabilities: parseFloat(formData.total_liabilities?.replace(/,/g, '')) || 0,
     };
 
     const assessment = runFullAssessment(inputs);

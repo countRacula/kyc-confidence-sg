@@ -155,6 +155,7 @@ export default function Assessment() {
           counterparties={counterparties}
           preselectedCounterpartyId={preselectedId}
           user={user}
+          organisation={organisation}
           onComplete={handleComplete}
         />
       </div>

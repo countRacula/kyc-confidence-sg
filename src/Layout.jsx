@@ -78,7 +78,7 @@ export default function Layout({ children, currentPageName }) {
   const showBottomNav = bottomNavPages.includes(currentPageName);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 overscroll-none">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -229,7 +229,7 @@ export default function Layout({ children, currentPageName }) {
         </header>
 
         {/* Page content */}
-        <main className="overscroll-none">
+        <main>
           {children}
         </main>
 

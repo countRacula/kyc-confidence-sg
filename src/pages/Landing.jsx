@@ -87,14 +87,15 @@ export default function Landing() {
             using local business criteria that matter.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg"
-              onClick={() => base44.auth.redirectToLogin()}
-              className="bg-emerald-600 hover:bg-emerald-700 text-base px-8"
-            >
-              Start Free Assessment
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            <Link to={createPageUrl('FreeAssessment')}>
+              <Button 
+                size="lg"
+                className="bg-emerald-600 hover:bg-emerald-700 text-base px-8"
+              >
+                Start Free Assessment
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

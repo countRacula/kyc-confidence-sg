@@ -3,12 +3,21 @@
 export function generateFinancialRanges() {
   const ranges = [];
   
-  // Under S$1M: S$10k bands
-  for (let i = 0; i < 1000000; i += 10000) {
+  // 0 to S$100k: S$10k bands
+  for (let i = 0; i < 100000; i += 10000) {
     ranges.push({
       value: `${i}-${i + 9999}`,
       label: `S$${formatNumber(i)} - S$${formatNumber(i + 9999)}`,
       midpoint: i + 5000
+    });
+  }
+  
+  // S$100k to S$1M: S$50k bands
+  for (let i = 100000; i < 1000000; i += 50000) {
+    ranges.push({
+      value: `${i}-${i + 49999}`,
+      label: `S$${formatNumber(i)} - S$${formatNumber(i + 49999)}`,
+      midpoint: i + 25000
     });
   }
   

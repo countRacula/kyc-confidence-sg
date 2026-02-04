@@ -53,20 +53,12 @@ export default function Landing() {
               <p className="text-xs text-slate-500">Singapore Edition</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              onClick={() => base44.auth.redirectToLogin()}
-            >
-              Sign In
-            </Button>
-            <Button 
-              onClick={() => base44.auth.redirectToLogin()}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              Get Started
-            </Button>
-          </div>
+          <Button 
+            variant="ghost" 
+            onClick={() => base44.auth.redirectToLogin(createPageUrl('Dashboard'))}
+          >
+            Sign In
+          </Button>
         </div>
       </header>
 
@@ -87,15 +79,14 @@ export default function Landing() {
             using local business criteria that matter.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to={createPageUrl('FreeAssessment')}>
-              <Button 
-                size="lg"
-                className="bg-emerald-600 hover:bg-emerald-700 text-base px-8"
-              >
-                Start Free Assessment
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
+            <Button 
+              size="lg"
+              onClick={() => base44.auth.redirectToLogin(createPageUrl('Dashboard'))}
+              className="bg-emerald-600 hover:bg-emerald-700 text-base px-8"
+            >
+              Create Your Free Account
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
           </div>
         </div>
       </section>
@@ -176,10 +167,10 @@ export default function Landing() {
           <Button 
             size="lg"
             variant="secondary"
-            onClick={() => base44.auth.redirectToLogin()}
+            onClick={() => base44.auth.redirectToLogin(createPageUrl('Dashboard'))}
             className="bg-white text-emerald-700 hover:bg-emerald-50"
           >
-            Create Your Account
+            Create Your Free Account
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </Card>

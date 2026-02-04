@@ -58,6 +58,7 @@ import Records from './pages/Records';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
 import UserManagement from './pages/UserManagement';
+import Archive from './pages/Archive';
 import __Layout from './Layout.jsx';
 
 
@@ -73,6 +74,7 @@ export const PAGES = {
     "Reports": Reports,
     "Settings": Settings,
     "UserManagement": UserManagement,
+    "Archive": Archive,
 }
 
 export const pagesConfig = {

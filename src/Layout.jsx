@@ -20,6 +20,7 @@ const navigation = [
   { name: 'Dashboard', icon: LayoutDashboard, page: 'Dashboard' },
   { name: 'Records', icon: Building2, page: 'Records' },
   { name: 'Assessment', icon: FileCheck, page: 'Assessment' },
+  { name: 'Archive', icon: BarChart3, page: 'Archive' },
   { name: 'Reports', icon: BarChart3, page: 'Reports' },
 ];
 

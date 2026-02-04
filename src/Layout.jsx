@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { 
   LayoutDashboard, Building2, FileCheck, BarChart3, 
-  Settings, LogOut, Menu, X, Shield, ChevronDown
+  Settings, LogOut, Menu, X, Shield, ChevronDown, Users
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -161,6 +161,17 @@ export default function Layout({ children, currentPageName }) {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
+                {user?.org_role === 'admin' && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to={createPageUrl('UserManagement')} className="flex items-center gap-2 select-none">
+                        <Users className="w-4 h-4" />
+                        User Management
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to={createPageUrl('Settings')} className="flex items-center gap-2 select-none">
                     <Settings className="w-4 h-4" />

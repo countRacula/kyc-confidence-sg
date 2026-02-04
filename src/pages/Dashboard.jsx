@@ -291,28 +291,32 @@ export default function Dashboard() {
             <CardContent>
               {recentAssessments.length > 0 ? (
                 <div className="space-y-3">
-                  {recentAssessments.map(assessment => (
-                    <div 
-                      key={assessment.id} 
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border">
-                          <Building2 className="w-5 h-5 text-slate-400" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-slate-900">{assessment.counterparty_name}</p>
-                          <p className="text-xs text-slate-500">
-                            {format(new Date(assessment.created_date), 'dd MMM yyyy')}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg font-bold text-slate-700">{assessment.total_score}</span>
-                        <RiskBadge band={assessment.risk_band} size="sm" />
-                      </div>
-                    </div>
-                  ))}
+                   {recentAssessments.map(assessment => (
+                     <Link
+                       key={assessment.id}
+                       to={createPageUrl(`Assessment?view=${assessment.id}`)}
+                     >
+                       <div 
+                         className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                       >
+                         <div className="flex items-center gap-3">
+                           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border">
+                             <Building2 className="w-5 h-5 text-slate-400" />
+                           </div>
+                           <div>
+                             <p className="font-medium text-slate-900">{assessment.counterparty_name}</p>
+                             <p className="text-xs text-slate-500">
+                               {format(new Date(assessment.created_date), 'dd MMM yyyy')}
+                             </p>
+                           </div>
+                         </div>
+                         <div className="flex items-center gap-3">
+                           <span className="text-lg font-bold text-slate-700">{assessment.total_score}</span>
+                           <RiskBadge band={assessment.risk_band} size="sm" />
+                         </div>
+                       </div>
+                     </Link>
+                   ))}
                 </div>
               ) : (
                 <div className="text-center py-12 text-slate-500">

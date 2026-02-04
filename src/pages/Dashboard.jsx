@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [recentAssessments, setRecentAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {

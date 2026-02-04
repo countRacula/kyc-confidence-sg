@@ -20,7 +20,6 @@ const ENTITY_TYPES = [
 ];
 
 const COUNTERPARTY_TYPES = [
-  { value: 'vendor', label: 'Vendor' },
   { value: 'supplier', label: 'Supplier' },
   { value: 'client', label: 'Client' }
 ];

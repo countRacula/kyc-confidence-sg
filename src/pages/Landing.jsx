@@ -164,16 +164,18 @@ export default function Landing() {
           <p className="text-emerald-100 mb-8 max-w-xl mx-auto">
             Join Singapore SMEs who use KYC Confidence to make better credit decisions.
           </p>
-          <Link to={createPageUrl('Onboarding')}>
-            <Button 
-              size="lg"
-              variant="secondary"
-              className="bg-white text-emerald-700 hover:bg-emerald-50"
-            >
-              Create Your Free Account
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
+          <div className="flex justify-center">
+            <Link to={createPageUrl('Onboarding')}>
+              <Button 
+                size="lg"
+                variant="secondary"
+                className="bg-white text-emerald-700 hover:bg-emerald-50"
+              >
+                Create Your Free Account
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </Card>
       </section>
 

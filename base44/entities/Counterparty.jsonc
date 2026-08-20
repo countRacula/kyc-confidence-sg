@@ -1,0 +1,130 @@
+{
+  "name": "Counterparty",
+  "type": "object",
+  "properties": {
+    "org_id": {
+      "type": "string",
+      "description": "Organisation ID"
+    },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "vendor",
+          "supplier",
+          "client"
+        ]
+      },
+      "description": "Counterparty types"
+    },
+    "name": {
+      "type": "string",
+      "description": "Counterparty name"
+    },
+    "uen": {
+      "type": "string",
+      "description": "Unique Entity Number (Singapore)"
+    },
+    "uen_status": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "pending",
+        "not_applicable"
+      ],
+      "default": "pending"
+    },
+    "entity_type": {
+      "type": "string",
+      "enum": [
+        "pte_ltd",
+        "sole_proprietor",
+        "partnership",
+        "llp",
+        "public",
+        "others"
+      ]
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Incorporation/Start date"
+    },
+    "registered_address": {
+      "type": "string"
+    },
+    "primary_contact_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "in_review",
+        "inactive"
+      ],
+      "default": "active"
+    },
+    "ownership_locale": {
+      "type": "string",
+      "enum": [
+        "sg_majority",
+        "mixed",
+        "foreign_majority",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "directors_count": {
+      "type": "number"
+    },
+    "shareholders_count": {
+      "type": "number"
+    },
+    "shareholding_complexity": {
+      "type": "string",
+      "enum": [
+        "simple",
+        "moderate",
+        "complex",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "governance_changes": {
+      "type": "string",
+      "enum": [
+        "yes",
+        "no",
+        "unknown"
+      ],
+      "default": "unknown",
+      "description": "Frequent changes in last 12 months"
+    },
+    "ubo_clarity": {
+      "type": "string",
+      "enum": [
+        "clear",
+        "partial",
+        "unclear",
+        "unknown"
+      ],
+      "default": "unknown"
+    }
+  },
+  "required": [
+    "org_id",
+    "name"
+  ]
+}

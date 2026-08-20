@@ -1,0 +1,155 @@
+{
+  "name": "Assessment",
+  "type": "object",
+  "properties": {
+    "org_id": {
+      "type": "string"
+    },
+    "counterparty_id": {
+      "type": "string"
+    },
+    "counterparty_name": {
+      "type": "string"
+    },
+    "assessor_email": {
+      "type": "string"
+    },
+    "inputs": {
+      "type": "object",
+      "description": "All assessment inputs",
+      "properties": {
+        "company_status": {
+          "type": "string"
+        },
+        "address_type": {
+          "type": "string"
+        },
+        "has_sg_bank": {
+          "type": "string"
+        },
+        "has_sg_signatory": {
+          "type": "string"
+        },
+        "ownership_locale": {
+          "type": "string"
+        },
+        "shareholding_complexity": {
+          "type": "string"
+        },
+        "governance_changes": {
+          "type": "string"
+        },
+        "ubo_clarity": {
+          "type": "string"
+        },
+        "revenue": {
+          "type": "number"
+        },
+        "cogs": {
+          "type": "number"
+        },
+        "is_service_business": {
+          "type": "boolean"
+        },
+        "operating_expenses": {
+          "type": "number"
+        },
+        "current_assets": {
+          "type": "number"
+        },
+        "current_liabilities": {
+          "type": "number"
+        },
+        "total_liabilities": {
+          "type": "number"
+        },
+        "total_assets": {
+          "type": "number"
+        },
+        "sanctions_concern": {
+          "type": "string"
+        },
+        "adverse_media": {
+          "type": "string"
+        },
+        "inconsistencies": {
+          "type": "string"
+        }
+      }
+    },
+    "computed_metrics": {
+      "type": "object",
+      "description": "Calculated financial ratios",
+      "properties": {
+        "net_margin": {
+          "type": "number"
+        },
+        "current_ratio": {
+          "type": "number"
+        },
+        "debt_ratio": {
+          "type": "number"
+        },
+        "debt_ratio_type": {
+          "type": "string"
+        },
+        "operating_buffer_months": {
+          "type": "number"
+        }
+      }
+    },
+    "component_scores": {
+      "type": "object",
+      "properties": {
+        "sg_presence": {
+          "type": "number"
+        },
+        "ownership": {
+          "type": "number"
+        },
+        "financial": {
+          "type": "number"
+        },
+        "red_flags": {
+          "type": "number"
+        }
+      }
+    },
+    "total_score": {
+      "type": "number"
+    },
+    "risk_band": {
+      "type": "string",
+      "enum": [
+        "green",
+        "amber",
+        "red",
+        "high_risk",
+        "fail"
+      ]
+    },
+    "hard_stop_flag": {
+      "type": "boolean",
+      "default": false
+    },
+    "hard_stop_reason": {
+      "type": "string"
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommended_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "org_id",
+    "counterparty_id"
+  ]
+}

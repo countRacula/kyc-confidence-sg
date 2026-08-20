@@ -1,0 +1,48 @@
+{
+  "name": "Organisation",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Organisation/Company name"
+    },
+    "industry": {
+      "type": "string",
+      "description": "Industry sector (optional)"
+    },
+    "org_size_type": {
+      "type": "string",
+      "enum": [
+        "SME",
+        "Enterprise"
+      ],
+      "default": "SME",
+      "description": "Organisation size type (drives financial input UX)"
+    },
+    "settings": {
+      "type": "object",
+      "description": "Organisation settings including scoring weights",
+      "properties": {
+        "sg_presence_weight": {
+          "type": "number",
+          "default": 30
+        },
+        "ownership_weight": {
+          "type": "number",
+          "default": 30
+        },
+        "financial_weight": {
+          "type": "number",
+          "default": 40
+        },
+        "red_flags_weight": {
+          "type": "number",
+          "default": 10
+        }
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

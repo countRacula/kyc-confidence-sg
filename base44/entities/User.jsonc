@@ -1,0 +1,32 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "org_id": {
+      "type": "string",
+      "description": "Organisation ID this user belongs to"
+    },
+    "org_role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "manager",
+        "viewer"
+      ],
+      "default": "viewer",
+      "description": "Role within the organisation"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "pending"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "org_id"
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "name": "NegativePressCheck",
+  "type": "object",
+  "properties": {
+    "org_id": {
+      "type": "string",
+      "description": "Organisation ID"
+    },
+    "counterparty_id": {
+      "type": "string",
+      "description": "Counterparty being checked"
+    },
+    "assessment_id": {
+      "type": "string",
+      "description": "Optional assessment link"
+    },
+    "executed_by_user_id": {
+      "type": "string",
+      "description": "User who ran the check"
+    },
+    "executed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When check was executed (SGT)"
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Search parameters used",
+      "properties": {
+        "company_name": {
+          "type": "string"
+        },
+        "uen": {
+          "type": "string"
+        },
+        "director_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "locale": {
+          "type": "string",
+          "enum": [
+            "Singapore",
+            "Global"
+          ]
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "time_window": {
+          "type": "string"
+        },
+        "custom_terms": {
+          "type": "string"
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "description": "Search results",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "publisher": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "published_date": {
+            "type": "string"
+          },
+          "snippet": {
+            "type": "string"
+          },
+          "per_article_summary": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string",
+            "enum": [
+              "Allegation",
+              "Investigation",
+              "Civil dispute",
+              "Enforcement",
+              "Conviction",
+              "Insolvency",
+              "Other"
+            ]
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "Low",
+              "Medium",
+              "High"
+            ]
+          }
+        }
+      }
+    },
+    "rollup_summary": {
+      "type": "object",
+      "description": "Overall analysis",
+      "properties": {
+        "overall_signal": {
+          "type": "string",
+          "enum": [
+            "None",
+            "Informational",
+            "Potential Risk",
+            "High Risk"
+          ]
+        },
+        "summary_text": {
+          "type": "string"
+        },
+        "most_recent_date": {
+          "type": "string"
+        },
+        "counts_by_severity": {
+          "type": "object",
+          "properties": {
+            "low": {
+              "type": "number"
+            },
+            "medium": {
+              "type": "number"
+            },
+            "high": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "cached_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cache expiry timestamp"
+    }
+  },
+  "required": [
+    "org_id",
+    "counterparty_id",
+    "executed_by_user_id",
+    "executed_at"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "org_id": {
+      "type": "string",
+      "description": "Organisation ID"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "User who performed the action"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Full name of user"
+    },
+    "action": {
+      "type": "string",
+      "description": "Action performed",
+      "enum": [
+        "user_invited",
+        "user_role_updated",
+        "counterparty_created",
+        "counterparty_updated",
+        "counterparty_deleted",
+        "assessment_created",
+        "assessment_updated",
+        "assessment_deleted",
+        "org_settings_updated"
+      ]
+    },
+    "entity_type": {
+      "type": "string",
+      "description": "Type of entity affected"
+    },
+    "entity_id": {
+      "type": "string",
+      "description": "ID of affected entity"
+    },
+    "details": {
+      "type": "object",
+      "description": "Additional action details"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When action occurred"
+    }
+  },
+  "required": [
+    "org_id",
+    "user_email",
+    "action",
+    "timestamp"
+  ]
+}

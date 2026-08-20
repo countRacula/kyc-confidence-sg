@@ -1,0 +1,34 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "org_id": {
+      "type": "string"
+    },
+    "counterparty_id": {
+      "type": "string"
+    },
+    "assessment_id": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "file_name": {
+      "type": "string"
+    },
+    "file_type": {
+      "type": "string",
+      "enum": [
+        "acra_profile",
+        "financial_statement",
+        "other"
+      ]
+    }
+  },
+  "required": [
+    "org_id",
+    "file_url",
+    "file_name"
+  ]
+}
